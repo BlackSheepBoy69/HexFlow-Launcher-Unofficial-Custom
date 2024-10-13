@@ -1,4 +1,4 @@
-﻿-- HexFlow Launcher Custom version 2.3.1
+-- HexFlow Launcher Custom version 2.3.1
 -- based on VitaHEX's HexFlow Launcher v0.5 + SwitchView UI v0.1.2 + jimbob4000's Retroflow v5.0.2
 -- https://www.patreon.com/vitahex
 -- Want to make your own version? Right-click the vpk and select "Open with... Winrar" and edit the index.lua inside.
@@ -1633,7 +1633,7 @@ function GetInfoSelected()
         if xCatLookup(showCat)[p].launch_type == 0 then
 	    if System.doesFileExist(working_dir .. "/" .. xCatLookup(showCat)[p].name .. "/sce_sys/param.sfo") then
 		appdir=working_dir .. "/" .. xCatLookup(showCat)[p].name	    --example: "ux0:app/SLUS00453"
-		app_size_text = "Size: " .. string.format("%02d", getAppSize(appdir)/1024/1024) .. "Mb"
+		app_size_text = "Size : " .. string.format("%02d", getAppSize(appdir)/1024/1024) .. "Mb"
         	info = System.extractSfo(appdir .. "/sce_sys/param.sfo")
         	icon_path = "ur0:/appmeta/" .. xCatLookup(showCat)[p].name .. "/icon0.png"
         	pic_path = "ur0:/appmeta/" .. xCatLookup(showCat)[p].name .. "/pic0.png"
@@ -1655,7 +1655,7 @@ function GetInfoSelected()
 	    if app_size < 900000 and apptype ~= 3 then
 		app_size_text = "Size: 0Mb, " .. string.format("%02d", app_size/1024) .. "Kb"
 	    else
-		app_size_text = "Size: " .. string.format("%02d", app_size/1024/1024) .. "Mb"
+		app_size_text = "Size : " .. string.format("%02d", app_size/1024/1024) .. "Mb"
 	    end
 	    icon_path = xSIconLookup(apptype)
 	    if apptype == 2 then
@@ -1969,10 +1969,10 @@ function DownloadCategoryCovers()
 
     if status ~= RUNNING then
 	if not Network.isWifiEnabled() then
-	    System.setMessage("Internet Connection Required", false, BUTTON_OK)
+	    System.setMessage(lang_lines[124], false, BUTTON_OK)
 	else
-	    System.setMessage("Downloading covers...", true)
-	    System.setMessageProgMsg("Downloading covers...")
+	    System.setMessage(lang_lines[126], true)
+	    System.setMessageProgMsg(lang_lines[126])
 	    for i=1, #xCatLookup(getCovers) do
 		if string.match(xCatLookup(getCovers)[i].icon_path, "/COVERS/") == nil
 		and DownloadCover(xCatLookup(getCovers)[i]) then
@@ -1983,7 +1983,7 @@ function DownloadCategoryCovers()
 		Screen.flip()
 
 		System.setMessageProgress(i / #xCatLookup(getCovers) * 100)
-		System.setMessageProgMsg("Downloading " .. xTextLookup(getCovers) .. " covers...\nCover " .. xCatLookup(getCovers)[i].name .. "\nFound " .. cvrfound .. " of " .. #xCatLookup(getCovers))
+		System.setMessageProgMsg(lang_lines[127] .. "\n" ..lang_lines[128] .. xCatLookup(getCovers)[i].name .. "\n" .. lang_lines[129] ..  cvrfound .. lang_lines[130] .. #xCatLookup(getCovers))
 
 		Graphics.initBlend()
 		Graphics.termBlend()
@@ -2264,7 +2264,7 @@ function DownloadSingleCover()
 
     if status ~= RUNNING then
 	if not Network.isWifiEnabled() then
-	    System.setMessage("Internet Connection Required", false, BUTTON_OK)
+	    System.setMessage(lang_lines[124], false, BUTTON_OK)
 	elseif DownloadCover(xCatLookup(showCat)[p]) then
 	    Threads.addTask(xCatLookup(showCat)[p], {
 	    Type = "ImageLoad",
@@ -2274,7 +2274,7 @@ function DownloadSingleCover()
 	    })
 	    System.setMessage(lang_lines[56]:gsub("*", DISC_ID or xCatLookup(showCat)[p].name), false, BUTTON_OK) --Cover XXXXXXXXX found!
 	else
-	    System.setMessage("Cover not found", false, BUTTON_OK)
+	    System.setMessage(lang_lines[125], false, BUTTON_OK)
 	end
     end
     gettingCovers = false
@@ -2286,13 +2286,13 @@ function DownloadSingleSnap()
 
     if status ~= RUNNING then
 	if not Network.isWifiEnabled() then
-	    System.setMessage("Internet Connection Required", false, BUTTON_OK)
+	    System.setMessage(lang_lines[124], false, BUTTON_OK)
 	elseif not (setBackground > 0.5) then
 	    System.setMessage(lang_lines[18] .. ": " .. lang_lines[23], false, BUTTON_OK) --Custom Background OFF
 	elseif DownloadSnap(xCatLookup(showCat)[p]) then
 	    System.setMessage(lang_lines[56]:gsub("*", DISC_ID or xCatLookup(showCat)[p].name), false, BUTTON_OK) --Cover XXXXXXXXX found!
 	else
-	    System.setMessage("Cover not found", false, BUTTON_OK)
+	    System.setMessage(lang_lines[125], false, BUTTON_OK)
 	end
     end
     gettingCovers = false
@@ -2757,9 +2757,9 @@ while true do
     
         Font.print(fnt22, 50, 190, txtname, white)-- app name
 	if DISC_ID and DISC_ID ~= app_titleid then
-	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. " (" .. DISC_ID .. ")\nVersion: " .. app_version .. "\n" .. app_size_text, white)-- Draw info (PS1)
+	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID : " .. app_titleid .. " (" .. DISC_ID .. ")\nVersion : " .. app_version .. "\n" .. app_size_text, white)-- Draw info (PS1)
 	else
-	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. "\nVersion: " .. app_version .. "\n" .. app_size_text, white)-- Draw info (not PS1)
+	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID : " .. app_titleid .. "\nVersion : " .. app_version .. "\n" .. app_size_text, white)-- Draw info (not PS1)
 	end
 		
 	if tmpappcat==1 then
@@ -2771,15 +2771,15 @@ while true do
 	elseif tmpappcat==4 then
 	    tmpcatText = "Homebrew"
 	else
-	    tmpcatText = "Default"
+	    tmpcatText = lang_lines[123]
 	end
 
 	if xCatLookup(showCat)[p].launch_type == 0 then
 	    menuItems = 2
 	    Graphics.fillRect(24, 470, 350 + (menuY * 40), 390 + (menuY * 40), themeCol)-- selection
-	    Font.print(fnt22, 50, 352, "Download Cover", white)
-	    Font.print(fnt22, 50, 352+40, "Override Category: < " .. tmpcatText .. " >", white)
-	    Font.print(fnt22, 50, 352+80, "Rename", white)
+	    Font.print(fnt22, 50, 352, lang_lines[120], white)
+	    Font.print(fnt22, 50, 352+40, lang_lines[121] .. ": < " .. tmpcatText .. " >", white)
+	    Font.print(fnt22, 50, 352+80, lang_lines[122], white)
 
 	    --if xCatLookup(showCat)[p].fave_heart == true then
 	    --    Graphics.drawImage(420, 50, imgFav_large_on)
@@ -3491,7 +3491,7 @@ while true do
             .. "\n\nCredit to VitaHEX, Sakis RG, and everyone who worked on HexFlow Launcher 0.5 which"
             .. "\nthis is based on, jimbob4000 and everyone who worked on RetroFlow Launcher 5.0.2, for"
             .. "\ngeneral support/inspiration, Rinnegatamante for Lua Player Plus, Axce, Fwannmacher"
-            .. "\nDaRk_ViVi, yzzyx-network, Google Translate, and one or more coders anonymous.", white)-- Draw info
+            .. "\nDaRk_ViVi, yzzyx-network, all translator, and one or more coders anonymous.", white)-- Draw info
     
     end
     
