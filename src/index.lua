@@ -1,4 +1,4 @@
--- HexFlow Launcher Custom version 2.3.1
+﻿-- HexFlow Launcher Custom version 2.4
 -- based on VitaHEX's HexFlow Launcher v0.5 + SwitchView UI v0.1.2 + jimbob4000's Retroflow v5.0.2
 -- https://www.patreon.com/vitahex
 -- Want to make your own version? Right-click the vpk and select "Open with... Winrar" and edit the index.lua inside.
@@ -11,7 +11,7 @@ local sortTime = 0
 
 dofile("app0:addons/threads.lua")
 local working_dir = "ux0:/app"
-local appversion = "2.3.1"
+local appversion = "2.4"
 function System.currentDirectory(dir)
     if dir == nil then
         return working_dir --"ux0:/app"
@@ -21,9 +21,9 @@ function System.currentDirectory(dir)
 end
 
 Network.init()
---@@ This app uses the RetroFlow cover archive: https://github.com/jimbob4000/hexflow-covers/
---@@ Sample: https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PSVita/PCSA00029.png
---@@ For more details, check the 'DownloadCover' function.
+-- This app uses the RetroFlow cover archive: https://github.com/jimbob4000/hexflow-covers/
+-- Sample: https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/PSVita/PCSA00029.png
+-- For more details, check the 'DownloadCover' function.
 
 -- Speed related settings. System.getCpuSpeed() can be used to check current status.
 System.setBusSpeed(222)
@@ -56,22 +56,22 @@ local CTRL_CANCEL = SCE_CTRL_CIRCLE
 
 -- Footer button margins
 local btnMargin = 44	 -- Retroflow: 64. HEXFlow: ~46
-local btnImgWidth = 20	 -- width of btnX/etc for spacing calculations.
+--@@local btnImgWidth = 20	 -- width of btnX/etc for spacing calculations.
 
 -- Footer button X coordinates. Calculated in changeLanguage(). Alts are for start menu.
 local label1AltImgX = 0
 local label2AltImgX = 0
-local label1AltX = 0
-local label2AltX = 0
+--@@local label1AltX = 0
+--@@local label2AltX = 0
 local label1ImgX = 0
 local label2ImgX = 0
 local label3ImgX = 0
 local label4ImgX = 0
-local label1X = 0
-local label2X = 0
-local label3X = 0
-local label4X = 0
-local toggle1X = nil
+--@@local label1X = 0
+--@@local label2X = 0
+--@@local label3X = 0
+--@@local label4X = 0
+--@@local toggle1X = nil
 local toggle2X = nil
 
 local spin_allowance = 0
@@ -415,9 +415,17 @@ function load_RetroFlow()
     RetroflowAssetsAreLoaded = true
 end
 
+local fontfile = "app0:/DATA/font.woff"		 --@@ NEW!
+local fontfile_old = ""				 --@@ NEW! Not necessary if language is made unchangeable
+local fnt15					 --@@ NEW! (1/5) Hopefully these locals being nul doesn't cause issues
+local fnt20					 --@@ NEW! (2/5)
+local fnt22					 --@@ NEW! (3/5)
+local fnt23_5					 --@@ NEW! (4/5)
+local fnt25					 --@@ NEW! (5/5)
+
 function load_SwitchView()
-    fnt23_5 = Font.load("app0:/DATA/font.woff")
-    Font.setPixelSizes(fnt23_5, 23.5)
+--@@fnt23_5 = Font.load("app0:/DATA/font.woff")	 --@@ Moved to ChangeLanguage()
+--@@Font.setPixelSizes(fnt23_5, 23.5)		 --@@ Moved to ChangeLanguage()
     imgCart = Graphics.loadImage("app0:/DATA/cart.png")
     --imgAvatar = Graphics.loadImage("app0:/AVATARS/AV01.png")
     --imgCont = Graphics.loadImage("app0:/DATA/cont.png")
@@ -433,19 +441,20 @@ function load_SwitchView()
     SwitchviewAssetsAreLoaded = true
 end
 
-local fnt15 = Font.load("app0:/DATA/font.woff")
-local fnt20 = Font.load("app0:/DATA/font.woff")
-local fnt22 = Font.load("app0:/DATA/font.woff")
-local fnt25 = Font.load("app0:/DATA/font.woff")
-
-Font.setPixelSizes(fnt15, 15)
-Font.setPixelSizes(fnt20, 20)
-Font.setPixelSizes(fnt22, 22)
-Font.setPixelSizes(fnt25, 25)
+--@@ MOVED
+--@@local fnt15 = Font.load("app0:/DATA/font.woff")
+--@@local fnt20 = Font.load("app0:/DATA/font.woff")
+--@@local fnt22 = Font.load("app0:/DATA/font.woff")
+--@@local fnt25 = Font.load("app0:/DATA/font.woff")
+--@@
+--@@Font.setPixelSizes(fnt15, 15)
+--@@Font.setPixelSizes(fnt20, 20)
+--@@Font.setPixelSizes(fnt22, 22)
+--@@Font.setPixelSizes(fnt25, 25)
 
 function sanitize(some_data)
     some_data = tostring(some_data)
-    return some_data:gsub("\r", ""):gsub("\n", " "):gsub("\t", " ")
+    return some_data:gsub("\r", ""):gsub("\n", " "):gsub("\t", " "):gsub("%c","")	 --@@ NEW! Now filters control (invisible) characters
 end
 
 local menuX = 0
@@ -488,9 +497,9 @@ local blue = Color.new(2, 72, 158)
 local yellow = Color.new(225, 184, 0)
 local green = Color.new(79, 152, 37)
 local orange = Color.new(220, 120, 0)
-local pink = Color.new(170, 68, 101)	 --@@ NEW! Replaces the old 'purple' (151, 0, 185)
-local purple = Color.new(77, 4, 160)	 --@@ Used to be called 'darkpurple'
-local lightblue = Color.new(67,178,255)
+local pink = Color.new(170, 68, 101)
+local purple = Color.new(77, 4, 160)
+local lightblue = Color.new(67, 178, 255)
 local greyalpha = Color.new(45, 45, 45, 180)
 local bg = Color.new(153, 217, 234)
 local themeCol = Color.new(2, 72, 158)
@@ -549,7 +558,7 @@ local musicLoop = 1
 local themeColor = 0 -- 0 blue, 1 red, 2 yellow, 3 green, 4 grey, 5 black, 7 orange, 6 purple, 8 darkpurple. (reorder hack) 
 local menuItems = 3 
 local setBackground = 1 
-local setLanguage = 0 
+local setLanguage = System.getLanguage()	 --@@ NEW! Used to be 0
 local showHomebrews = 0 
 local setSwitch = 0
 local setRetroFlow = 0
@@ -586,9 +595,7 @@ function write_config()
 	.. lockView
 	.. showRecentlyPlayed
 	.. string.format("%02d", startCategory)	 -- Upgraded to double digits
---@@	.. string.format("%02d", setLanguage)
---@@	.. 0
-    ), 18)	 --@@ Used to be 21 before the experimental Error 597 fix.
+    ), 18)	 -- Used to be 21 before the experimental Error 597 fix.
     System.closeFile(file_config)
 end
 
@@ -615,7 +622,7 @@ function readBin(filename, allow_iso_scan)	 -- returns a string or nil
 
 	if data:sub(-10):upper() == "/EBOOT.PBP" then
 	    path_game = string.sub(data, -19, -11)	 -- Gets the "slus00453" from "ux0:pspemu/psp/game/slus00453/eboot.pbp"
-	    app_size_text = app_size_text .. " (" .. string.format("%02d", getAppSize(data:sub(0, -10))/1024/1024) .. "Mb)"	 --@@ NEW! Example: "01Mb (512Mb)"
+	    app_size_text = app_size_text .. " (" .. string.format("%02d", getAppSize(data:sub(0, -10))/1024/1024) .. "Mb)"	 -- Example: "01Mb (512Mb)"
 	elseif allow_iso_scan == true
 	 and data:sub(-4):upper() == ".ISO"
 	 and System.doesFileExist(data) then		 -- Example: "ux0:pspemu/ISO/Dantes_Inferno.iso"
@@ -636,45 +643,43 @@ function readBin(filename, allow_iso_scan)	 -- returns a string or nil
     end
 end
 
---@@function autoset_language()
-    local getLanguage = System.getLanguage()
+--@@    local getLanguage = System.getLanguage()	 --@@ MOVED UP
 
-    if getLanguage == 0 then
-	setLanguage = 9		 -- Japanese
-  --elseif (getLanguage == 1) or (getLanguage == 18) then	 -- 1=AmericanEnglish, 18=British
-  --	setLanguage = 0		 -- American English
-    elseif getLanguage == 2 then
-	setLanguage = 2		 -- French
-    elseif (getLanguage == 3) or (getLanguage == 20) then	 -- 3=Spanish, 20=SpanishLatin
-	setLanguage = 4		 -- Spanish
-    elseif getLanguage == 4 then
-	setLanguage = 1		 -- German
-    elseif getLanguage == 5 then
-	setLanguage = 3		 -- Italian
-    elseif (getLanguage == 7) or (getLanguage == 17) then	 -- 7=PortugeseTrad, 17=PortugeseBrazil
-	setLanguage = 7		 -- Portugese
-    elseif getLanguage == 8 then
-	setLanguage = 5		 -- Russian
-    elseif getLanguage == 13 then
-	setLanguage = 6		 -- Swedish
-    elseif getLanguage == 16 then
-	setLanguage = 8		 -- Polish
-    elseif getLanguage == 16 then
-	setLanguage = 8		 -- Polish
-    end	 -- Don't change what language is set if a system language has no co-responding HexFlow Custom language. These languages are as follows:
-	 -- 6=Dutch, 9=Korean, 10=ChineseTrad, 11=ChineseSimple, 12=Finnish, 14=Danish, 15=Norwegian, 19=Turkish
-	 -- Languages with no system language values which are should be imported from RetroFlow: Hungarian, Japanese Ryukyuan.
---@@end
+--@@ REMOVED. Unnecessary now that all languages are supported
+--@@    if getLanguage == 0 then
+--@@	setLanguage = 9		 -- Japanese
+--@@  --elseif (getLanguage == 1) or (getLanguage == 18) then	 -- 1=AmericanEnglish, 18=British
+--@@  --	setLanguage = 0		 -- American English
+--@@    elseif getLanguage == 2 then
+--@@	setLanguage = 2		 -- French
+--@@    elseif (getLanguage == 3) or (getLanguage == 20) then	 -- 3=Spanish, 20=SpanishLatin
+--@@	setLanguage = 4		 -- Spanish
+--@@    elseif getLanguage == 4 then
+--@@	setLanguage = 1		 -- German
+--@@    elseif getLanguage == 5 then
+--@@	setLanguage = 3		 -- Italian
+--@@    elseif (getLanguage == 7) or (getLanguage == 17) then	 -- 7=PortugeseTrad, 17=PortugeseBrazil
+--@@	setLanguage = 7		 -- Portugese
+--@@    elseif getLanguage == 8 then
+--@@	setLanguage = 5		 -- Russian
+--@@    elseif getLanguage == 13 then
+--@@	setLanguage = 6		 -- Swedish
+--@@    elseif getLanguage == 16 then
+--@@	setLanguage = 8		 -- Polish
+--@@    elseif getLanguage == 16 then
+--@@	setLanguage = 8		 -- Polish
+--@@    end	 -- Don't change what language is set if a system language has no co-responding HexFlow Custom language. These languages are as follows:
+--@@	 -- 6=Dutch, 9=Korean, 10=ChineseTrad, 11=ChineseSimple, 12=Finnish, 14=Danish, 15=Norwegian, 19=Turkish
+--@@	 -- Languages with no system language values which are should be imported from RetroFlow: Hungarian, Japanese Ryukyuan.
 
---@@function apply_XO_swap()
-    if Controls.getEnterButton() == SCE_CTRL_CIRCLE then
-	swapXO = 1
-	CTRL_ACCEPT, CTRL_CANCEL = CTRL_CANCEL, CTRL_ACCEPT
-	btnAccept, btnCancel = btnCancel, btnAccept
-    else
-	swapXO = 0
-    end
---@@end
+
+if Controls.getEnterButton() == SCE_CTRL_CIRCLE then
+    swapXO = 1
+    CTRL_ACCEPT, CTRL_CANCEL = CTRL_CANCEL, CTRL_ACCEPT
+    btnAccept, btnCancel = btnCancel, btnAccept
+else
+    swapXO = 0
+end
 
 -- READ SETTINGS
 if cur_quick_dir["config.dat"] then
@@ -700,15 +705,11 @@ if cur_quick_dir["config.dat"] then
     lockView =		 tonumber(string.sub(str, 15, 15)) or lockView
     showRecentlyPlayed = tonumber(string.sub(str, 16, 16)) or showRecentlyPlayed
     startCategory =	 tonumber(string.sub(str, 17, 18)) or startCategory	 -- Upgraded to double digits
---@@setLanguage =	 tonumber(string.sub(str, 19, 20)) or autoset_language() --@@ Unnecessary. This is now always scanned instead of cached.
-  --smoothScrolling = 	 tonumber(string.sub(str,   ,   )) or smoothScrolling	 -- unused
-  --arcadeMerge =	 tonumber(string.sub(str,   ,   )) or arcadeMerge	 -- unused
 else
---@@autoset_language()
     write_config()
 end
 
---@@apply_XO_swap()
+--apply_XO_swap()
 showCat = startCategory
 
 if showView > 4 then
@@ -771,11 +772,9 @@ function SetThemeColor()
     elseif themeColor == 7 then
         themeCol = orange
     elseif themeColor == 6 then
-    --@@themeCol = purple
-        themeCol = pink --@@ NEW!
+        themeCol = pink
     elseif themeColor == 8 then
-    --@@themeCol = darkpurple
-        themeCol = purple --@@ NEW!
+        themeCol = purple
     else
         themeCol = blue -- default blue
     end
@@ -796,39 +795,38 @@ function OneShotPrint(my_func)
     Graphics.freeImage(loadingCacheImg)
 end
 
+local lang = "EN"
 local lang_lines = {}
 local lang_default = "PS VITA\nHOMEBREWS\nPSP\nPS1\nALL\nSETTINGS\nLaunch\nDetails\nCategory\nView\nClose\nVersion\nAbout\nStartup Category\nReflection Effect\nSounds\nTheme Color\nCustom Background\nDownload Covers\nReload Covers Database\nLanguage\nON\nOFF\nRed\nYellow\nGreen\nGrey\nBlack\nPurple\nOrange\nBlue\nSelect"
 		  .. "Nintendo 64\nSuper Nintendo\nNintendo Entertainment System\nGame Boy Advance\nGame Boy Color\nGame Boy\nSega Genesis/Mega Drive\nSega Master System\nSega Game Gear\nMAME\nAmiga\nTurboGrafx-16\nPC Engine\nHomebrews Category\nStartup scan\nRefresh cache\nCUSTOM\nCover style\nScan\nPlease wait...\nMenu\nDark Purple"
 		  .. "Done. Please 'Refresh cache' via the start menu\nCover * found!\nCache has been updated.\nwriting to cache... please don't suspend/power off"
 function ChangeLanguage()
     lang_lines = {}
-    local lang = "EN.ini"
-     -- 0 EN, 1 DE, 2 FR, 3 IT, 4 SP, 5 RU, 6 SW, 7 PT, 8 PL, 9 JA
-    if setLanguage == 1 then
-	lang = "DE.ini"
-    elseif setLanguage == 2 then
-	lang = "FR.ini"
-    elseif setLanguage == 3 then
-	lang = "IT.ini"
-    elseif setLanguage == 4 then
-	lang = "SP.ini"
-    elseif setLanguage == 5 then
-	lang = "RU.ini"
-    elseif setLanguage == 6 then
-	lang = "SW.ini"
-    elseif setLanguage == 7 then
-	lang = "PT.ini"
-    elseif setLanguage == 8 then
-	lang = "PL.ini"
-    elseif setLanguage == 9 then
-	lang = "JA.ini"
-		
-    else
-        lang = "EN.ini"
+
+    if setLanguage == 0 then	  lang = "JA"	  -- Japanese
+    elseif setLanguage == 1 then  lang = "EN_USA" -- English (United States)
+    elseif setLanguage == 2 then  lang = "FR"	  -- French
+    elseif setLanguage == 3 then  lang = "SP"	  -- Spanish
+    elseif setLanguage == 4 then  lang = "DE"	  -- German
+    elseif setLanguage == 5 then  lang = "IT"	  -- Italian
+    elseif setLanguage == 6 then  lang = "NL"	  -- Dutch
+    elseif setLanguage == 7 then  lang = "PT"	  -- Portuguese (Portugal)
+    elseif setLanguage == 8 then  lang = "RU"	  -- Russian
+    elseif setLanguage == 9 then  lang = "KO"	  -- Korean
+    elseif setLanguage == 10 then lang = "CN_T"	  -- Chinese (Traditional)
+    elseif setLanguage == 11 then lang = "CN_S"	  -- Chinese (Simplified)
+    elseif setLanguage == 12 then lang = "FI"	  -- Finnish
+    elseif setLanguage == 13 then lang = "SW"	  -- Swedish
+    elseif setLanguage == 14 then lang = "DA"	  -- Danish
+    elseif setLanguage == 15 then lang = "NO"	  -- Norwegian
+    elseif setLanguage == 16 then lang = "PL"	  -- Polski
+    elseif setLanguage == 17 then lang = "PT_BR"  -- Portuguese (Brasil)
+    elseif setLanguage == 18 then lang = "EN"	  -- English (United Kingdom)
+    elseif setLanguage == 19 then lang = "TR"	  -- Turkish
     end
     
-    if System.doesFileExist("app0:/translations/" .. lang) then
-        langfile = "app0:/translations/" .. lang
+    if System.doesFileExist("app0:/translations/" .. lang .. ".ini") then
+        langfile = "app0:/translations/" .. lang .. ".ini"
     else
         --create default EN.ini if language is missing
 	handle = System.openFile("ux0:/data/HexFlow/EN.ini", FCREATE)
@@ -836,11 +834,38 @@ function ChangeLanguage()
         System.writeFile(handle, "" .. lang_default, string.len(lang_default))
         System.closeFile(handle)
 	langfile = "ux0:/data/HexFlow/EN.ini"
-        setLanguage=0
+        setLanguage = 18			 --@@ NEW! 18 for English (United Kingdom). Used to be 0 for HexFlow "English" (ambiguous)
     end
 
+    if lang == "KO" then
+	fontfile = "app0:/DATA/font_KO.otf"	 --@@ NotoSansCJK KR Regular Slim
+    elseif lang == "CN_S" then
+	fontfile = "app0:/DATA/font_CN_S.otf"	 --@@ NotoSansCJK SC Regular Slim
+    elseif lang == "CN_T" then
+	fontfile = "app0:/DATA/font_CN_T.otf"	 --@@ NotoSansCJK TC Regular
+    else
+	fontfile = "app0:/DATA/font.woff"	 --@@ Sawarabi Gothic Regular
+    end
+
+    if fontfile_old ~= fontfile then		 --@@ Not necessary if language is made unchangeable
+	fnt15 = Font.load(fontfile)
+	fnt20 = Font.load(fontfile)
+	fnt22 = Font.load(fontfile)
+	fnt23_5 = Font.load(fontfile)		 --@@ For SwitchView
+	fnt25 = Font.load(fontfile)
+
+	Font.setPixelSizes(fnt15, 15)
+	Font.setPixelSizes(fnt20, 20)
+	Font.setPixelSizes(fnt22, 22)
+	Font.setPixelSizes(fnt23_5, 23.5)	 --@@ For SwitchView
+	Font.setPixelSizes(fnt25, 25)
+    end						 --@@ Not necessary if language is made unchangeable
+    fontfile_old = fontfile			 --@@ Not necessary if language is made unchangeable
+
+--@@for line in io.lines("app0:/translations/" .. lang .. ".ini") do
     for line in io.lines(langfile) do
-        lang_lines[#lang_lines+1] = line
+    --@@lang_lines[#lang_lines+1] = line
+	table.insert(lang_lines, line)
     end
 
   --if arcadeMerge == 1 then
@@ -851,26 +876,28 @@ function ChangeLanguage()
 
 --Set footer button spacing.   btnMargin: 44    btnImgWidth: 20    8px img-text buffer.
     label1ImgX = 904-Font.getTextWidth(fnt20, lang_lines[7])			 --X
-    label1X = label1ImgX+btnImgWidth+8						 --Launch
+--@@label1X = label1ImgX+btnImgWidth+8						 --Launch
     label2ImgX = label1ImgX-(Font.getTextWidth(fnt20, lang_lines[8])+btnMargin)	 --Tri
-    label2X = label2ImgX+btnImgWidth+8						 --Details
+--@@label2X = label2ImgX+btnImgWidth+8						 --Details
     label3ImgX = label2ImgX-(Font.getTextWidth(fnt20, lang_lines[9])+btnMargin)	 --Box
-    label3X = label3ImgX+btnImgWidth+8						 --Category
+--@@label3X = label3ImgX+btnImgWidth+8						 --Category
     if categoryButton == 2 then
 	label4ImgX = label2ImgX-(Font.getTextWidth(fnt20, lang_lines[10])+btnMargin) --O
     else
 	label4ImgX = label3ImgX-(Font.getTextWidth(fnt20, lang_lines[10])+btnMargin) --O
     end
-    label4X = label4ImgX+btnImgWidth+8						 --View
+--@@label4X = label4ImgX+btnImgWidth+8						 --View
 
     label1AltImgX = 900-Font.getTextWidth(fnt20, lang_lines[11])			--O
-    label1AltX = label1AltImgX+btnImgWidth+8						--Close
+--@@label1AltX = label1AltImgX+btnImgWidth+8						--Close
     label2AltImgX = label1AltImgX-(Font.getTextWidth(fnt20, lang_lines[32])+btnMargin)	--X
-    label2AltX = label2AltImgX+btnImgWidth+8						--Select
+--@@label2AltX = label2AltImgX+btnImgWidth+8						--Select
     
-    toggle1X = nil
+--@@toggle1X = nil
+    toggle2X = nil	 --@@ NEW!
 end
 ChangeLanguage()
+local imgFlag = Graphics.loadImage("app0:/translations/" .. lang .. ".png")
 
 function PrintCentered(font, x, y, text, color, size)
     text = text:gsub("\n","")
@@ -1633,7 +1660,7 @@ function GetInfoSelected()
         if xCatLookup(showCat)[p].launch_type == 0 then
 	    if System.doesFileExist(working_dir .. "/" .. xCatLookup(showCat)[p].name .. "/sce_sys/param.sfo") then
 		appdir=working_dir .. "/" .. xCatLookup(showCat)[p].name	    --example: "ux0:app/SLUS00453"
-		app_size_text = "Size : " .. string.format("%02d", getAppSize(appdir)/1024/1024) .. "Mb"
+		app_size_text = "Size: " .. string.format("%02d", getAppSize(appdir)/1024/1024) .. "Mb"
         	info = System.extractSfo(appdir .. "/sce_sys/param.sfo")
         	icon_path = "ur0:/appmeta/" .. xCatLookup(showCat)[p].name .. "/icon0.png"
         	pic_path = "ur0:/appmeta/" .. xCatLookup(showCat)[p].name .. "/pic0.png"
@@ -1655,7 +1682,7 @@ function GetInfoSelected()
 	    if app_size < 900000 and apptype ~= 3 then
 		app_size_text = "Size: 0Mb, " .. string.format("%02d", app_size/1024) .. "Kb"
 	    else
-		app_size_text = "Size : " .. string.format("%02d", app_size/1024/1024) .. "Mb"
+		app_size_text = "Size: " .. string.format("%02d", app_size/1024/1024) .. "Mb"
 	    end
 	    icon_path = xSIconLookup(apptype)
 	    if apptype == 2 then
@@ -1709,8 +1736,8 @@ function check_for_out_of_bounds()
 	    else
 		master_index = 1
 	    end
-	elseif showView == 6 and curTotal <= 12 then	 --@@ NEW! Less jumpy now.
-	    master_index = 1				 --@@ NEW! Less jumpy now.
+	elseif showView == 6 and curTotal <= 12 then
+	    master_index = 1
         elseif curTotal > 0 then
             master_index = p	 -- 0
         end
@@ -1804,7 +1831,7 @@ function DownloadCover(entry)
      or (apptype==22 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/C64/Covers/")		 -- C64
      or (apptype==23 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/WSWAN_COL/Covers/")	 -- WSCAN_COL
      or (apptype==24 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/WSWAN/Covers/")		 -- WSWAN
---@@ or (apptype==   and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/SCUMMVM/Covers/")	 --@@ new but unused. SCUMMVM
+--   or (apptype==   and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/SCUMMVM/Covers/")	 -- SCUMMVM @@ unused
      or (apptype==25 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/PICO-8/Covers/")	 -- PICO-8 @@ invalid
      or (apptype==26 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/MSX2/Covers/")		 -- MSX2
      or (apptype==27 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/MSX/Covers/")		 -- MSX1
@@ -1969,21 +1996,23 @@ function DownloadCategoryCovers()
 
     if status ~= RUNNING then
 	if not Network.isWifiEnabled() then
-	    System.setMessage(lang_lines[124], false, BUTTON_OK)
+	    System.setMessage(lang_lines[124], false, BUTTON_OK)	 --@@ NEW! Internet Connection Required
 	else
-	    System.setMessage(lang_lines[126], true)
-	    System.setMessageProgMsg(lang_lines[126])
+	    System.setMessage("Downloading covers...", true)
+	    System.setMessageProgMsg("Downloading covers...")
 	    for i=1, #xCatLookup(getCovers) do
 		if string.match(xCatLookup(getCovers)[i].icon_path, "/COVERS/") == nil
 		and DownloadCover(xCatLookup(getCovers)[i]) then
 		    cvrfound = cvrfound + 1
 		end
-		Graphics.initBlend()	 -- one of these sets of initBlend/termBlend/Screen.flip()'s might not be necessary.
+		Graphics.initBlend()					 -- one of these sets of initBlend/termBlend/Screen.flip()'s might not be necessary.
 		Graphics.termBlend()
 		Screen.flip()
 
 		System.setMessageProgress(i / #xCatLookup(getCovers) * 100)
-		System.setMessageProgMsg(lang_lines[127] .. "\n" ..lang_lines[128] .. xCatLookup(getCovers)[i].name .. "\n" .. lang_lines[129] ..  cvrfound .. lang_lines[130] .. #xCatLookup(getCovers))
+		System.setMessageProgMsg("Downloading " .. xTextLookup(getCovers) .. " covers...\nCover " .. xCatLookup(getCovers)[i].name .. "\nFound " .. cvrfound .. " of " .. #xCatLookup(getCovers))
+		--@@ Not sure why the below line isn't working
+--@@		System.setMessageProgMsg(lang_lines[51]:gsub("*", xTextLookup(getCovers)) .. "...\n" .. xCatLookup(getCovers)[i].name .. "\n" lang_lines[53]:gsub("*", cvrfound .. " / " .. #xCatLookup(getCovers)))
 
 		Graphics.initBlend()
 		Graphics.termBlend()
@@ -2264,7 +2293,7 @@ function DownloadSingleCover()
 
     if status ~= RUNNING then
 	if not Network.isWifiEnabled() then
-	    System.setMessage(lang_lines[124], false, BUTTON_OK)
+	    System.setMessage(lang_lines[124], false, BUTTON_OK)	 --@@ NEW! Internet Connection Required
 	elseif DownloadCover(xCatLookup(showCat)[p]) then
 	    Threads.addTask(xCatLookup(showCat)[p], {
 	    Type = "ImageLoad",
@@ -2274,7 +2303,7 @@ function DownloadSingleCover()
 	    })
 	    System.setMessage(lang_lines[56]:gsub("*", DISC_ID or xCatLookup(showCat)[p].name), false, BUTTON_OK) --Cover XXXXXXXXX found!
 	else
-	    System.setMessage(lang_lines[125], false, BUTTON_OK)
+	    System.setMessage(lang_lines[54], false, BUTTON_OK)		 --@@ NEW! Cover not found
 	end
     end
     gettingCovers = false
@@ -2286,13 +2315,13 @@ function DownloadSingleSnap()
 
     if status ~= RUNNING then
 	if not Network.isWifiEnabled() then
-	    System.setMessage(lang_lines[124], false, BUTTON_OK)
+	    System.setMessage(lang_lines[124], false, BUTTON_OK)	 --@@ NEW! Internet Connection Required
 	elseif not (setBackground > 0.5) then
 	    System.setMessage(lang_lines[18] .. ": " .. lang_lines[23], false, BUTTON_OK) --Custom Background OFF
 	elseif DownloadSnap(xCatLookup(showCat)[p]) then
 	    System.setMessage(lang_lines[56]:gsub("*", DISC_ID or xCatLookup(showCat)[p].name), false, BUTTON_OK) --Cover XXXXXXXXX found!
 	else
-	    System.setMessage(lang_lines[125], false, BUTTON_OK)
+	    System.setMessage(lang_lines[54], false, BUTTON_OK)		 --@@ NEW! Cover not found
 	end
     end
     gettingCovers = false
@@ -2545,7 +2574,7 @@ while true do
 		    base_y = grid_y
 		end
 	    end
-	    if skipRow == false and l > p-render_distance and l < p+render_distance+2 then						 --@@ (4/7)
+	    if skipRow == false and l > p-render_distance and l < p+render_distance+2 then
 		--if l==p and file.fave_heart == true then
 		--    Graphics.drawImage(685, 36, imgFav_small_on)
 		--end
@@ -2593,24 +2622,29 @@ while true do
 	end
 	-- Footer buttons and icons. X positions set in ChangeLanguage()
 	Graphics.drawImage(label1ImgX, 510, btnAccept)	 -- Used to be btnX
-	Font.print(fnt20, label1X, 508, lang_lines[7], white)--Launch
+--@@	Font.print(fnt20, label1X, 508, lang_lines[7], white)--Launch
+	Font.print(fnt20, label1ImgX + 28, 508, lang_lines[7], white)--Launch
 	Graphics.drawImage(label2ImgX, 510, btnT)
-	Font.print(fnt20, label2X, 508, lang_lines[8], white)--Details
+--@@	Font.print(fnt20, label2X, 508, lang_lines[8], white)--Details
+	Font.print(fnt20, label2ImgX + 28, 508, lang_lines[8], white)--Details
 	if categoryButton == 1 then
 	    Graphics.drawImage(label3ImgX, 510, btnD)
 	    Font.print(fnt22, 32, 34, xTextLookup(showCat), white)--PS VITA/HOMEBREWS/PSP/PSX/CUSTOM/ALL
-	    Font.print(fnt20, label3X, 508, lang_lines[9], white)--Category
+--@@	    Font.print(fnt20, label3X, 508, lang_lines[9], white)--Category
+	    Font.print(fnt20, label3ImgX + 28, 508, lang_lines[9], white)--Category
 	elseif categoryButton == 2 then
 	    Graphics.drawImage(34, 37, imgArrows)
 	    Font.print(fnt22, 52, 34, xTextLookup(showCat), white)--PS VITA/HOMEBREWS/PSP/PSX/CUSTOM/ALL
 	else
 	    Graphics.drawImage(label3ImgX, 510, btnS)
 	    Font.print(fnt22, 32, 34, xTextLookup(showCat), white)--PS VITA/HOMEBREWS/PSP/PSX/CUSTOM/ALL
-	    Font.print(fnt20, label3X, 508, lang_lines[9], white)--Category
+--@@	    Font.print(fnt20, label3X, 508, lang_lines[9], white)--Category
+	    Font.print(fnt20, label3ImgX + 28, 508, lang_lines[9], white)--Category
 	end
 	if lockView == 0 then
 	    Graphics.drawImage(label4ImgX, 510, btnCancel)	 -- Used to be btnO
-	    Font.print(fnt20, label4X, 508, lang_lines[10], white)--View
+--@@	    Font.print(fnt20, label4X, 508, lang_lines[10], white)--View
+	    Font.print(fnt20, label4ImgX + 28, 508, lang_lines[10], white)--View
 	end
 
 	if showView == 5 then
@@ -2692,58 +2726,60 @@ while true do
 	end
     elseif showMenu == 1 then
         
-        -- PREVIEW
-        -- Footer buttons and icons. positions set in ChangeLanguage()
-        Graphics.drawImage(label1AltImgX, 510, btnCancel)	 -- Used to be btnO
-        Font.print(fnt20, label1AltX, 508, lang_lines[11], white)--Close
-        Graphics.drawImage(label2AltImgX, 510, btnAccept)	 -- Used to be btnX
-        Font.print(fnt20, label2AltX, 508, lang_lines[32], white)--Select
-        
-        Graphics.fillRect(24, 470, 24, 470, darkalpha)
-        Render.setCamera(0, 0, 0, 0.0, 0.0, 0.0)
-        if inPreview == false then
-            if not pcall(loadImage, icon_path) then
-                iconTmp = imgCoverTmp
-            else
-                iconTmp = Graphics.loadImage(icon_path)
-            end
-            -- set pic0 as background
-            if System.doesFileExist(pic_path) and setBackground > 0.5 then
-                Graphics.freeImage(backTmp)
-                backTmp = Graphics.loadImage(pic_path)
-                Graphics.setImageFilters(backTmp, FILTER_LINEAR, FILTER_LINEAR)
-                Render.useTexture(modBackground, backTmp)
-            else
-                Render.useTexture(modBackground, imgCustomBack)
-            end
+	-- PREVIEW
+	-- Footer buttons and icons. positions set in ChangeLanguage()
+	Graphics.drawImage(label1AltImgX, 510, btnCancel)	 -- Used to be btnO
+--@@    Font.print(fnt20, label1AltX, 508, lang_lines[11], white)--Close
+	Font.print(fnt20, label1AltImgX + 28, 508, lang_lines[11], white)--Close
+	Graphics.drawImage(label2AltImgX, 510, btnAccept)	 -- Used to be btnX
+--@@    Font.print(fnt20, label2AltX, 508, lang_lines[32], white)--Select
+	Font.print(fnt20, label2AltImgX + 28, 508, lang_lines[32], white)--Select
+
+	Graphics.fillRect(24, 470, 24, 470, darkalpha)
+	Render.setCamera(0, 0, 0, 0.0, 0.0, 0.0)
+	if inPreview == false then
+	    if not pcall(loadImage, icon_path) then
+		iconTmp = imgCoverTmp
+	    else
+		iconTmp = Graphics.loadImage(icon_path)
+	    end
+	    -- set pic0 as background
+	    if System.doesFileExist(pic_path) and setBackground > 0.5 then
+		Graphics.freeImage(backTmp)
+		backTmp = Graphics.loadImage(pic_path)
+		Graphics.setImageFilters(backTmp, FILTER_LINEAR, FILTER_LINEAR)
+		Render.useTexture(modBackground, backTmp)
+	    else
+		Render.useTexture(modBackground, imgCustomBack)
+	    end
 
 	    menuY=0
 	    tmpappcat=0
-            inPreview = true
-        end
-        
-        -- animate cover zoom in
-        if prevX < 1.4 then
-            prevX = prevX + 0.1
-        end
-        if prevZ < 1 then
-            prevZ = prevZ + 0.06
-        end
-        if prevRot > -0.6 then
-            prevRot = prevRot - 0.04
-        end
-        
-        Graphics.drawImage(50, 50, iconTmp)-- icon
+	    inPreview = true
+	end
+
+	-- animate cover zoom in
+	if prevX < 1.4 then
+	    prevX = prevX + 0.1
+	end
+	if prevZ < 1 then
+	    prevZ = prevZ + 0.06
+	end
+	if prevRot > -0.6 then
+	    prevRot = prevRot - 0.04
+	end
+
+	Graphics.drawImage(50, 50, iconTmp)-- icon
 	--Graphics.drawScaleImage(50, 50, iconTmp, 128 / Graphics.getImageWidth(iconTmp), 128 / Graphics.getImageHeight(iconTmp)) --icon, stretched to frame (unused)
 
 	local file = xCatLookup(showCat)[p]	 -- Moved here now. Allows cleaner code below
 
-        -- txtname = string.sub(app_title, 1, 32) .. "\n" .. string.sub(app_title, 33)
+	-- txtname = string.sub(app_title, 1, 32) .. "\n" .. string.sub(app_title, 33)
 	txtname = string.sub(file.apptitle, 1, 32) .. "\n" .. string.sub(file.apptitle, 33)
-		
-        local tmpapptype=""	 -- text for game type
+
+	local tmpapptype=""	 -- text for game type
 	local tmpcatText=""	 -- text for currently selected override type
-        -- Draw box
+	-- Draw box
 	if apptype == 0 or apptype == 4 then
 	    tmpapptype = lang_lines[2]	 --Homebrew
 	elseif file.launch_type == 3 then
@@ -2754,32 +2790,32 @@ while true do
 
 	--Draw box
 	DrawCover(prevX, -1.0, file.name, file.ricon or imgCoverTmp, p, file.app_type, 0)
-    
-        Font.print(fnt22, 50, 190, txtname, white)-- app name
+
+	Font.print(fnt22, 50, 190, txtname, white)-- app name
 	if DISC_ID and DISC_ID ~= app_titleid then
-	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID : " .. app_titleid .. " (" .. DISC_ID .. ")\nVersion : " .. app_version .. "\n" .. app_size_text, white)-- Draw info (PS1)
+	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. " (" .. DISC_ID .. ")\nVersion: " .. app_version .. "\n" .. app_size_text, white)-- Draw info (PS1)
 	else
-	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID : " .. app_titleid .. "\nVersion : " .. app_version .. "\n" .. app_size_text, white)-- Draw info (not PS1)
+	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. "\nVersion: " .. app_version .. "\n" .. app_size_text, white)-- Draw info (not PS1)
 	end
-		
+
 	if tmpappcat==1 then
-	    tmpcatText = "PS Vita"
+	    tmpcatText = lang_lines[1]				 --@@ NEW! PS Vita
 	elseif tmpappcat==2 then
-	    tmpcatText = "PSP"
+	    tmpcatText = lang_lines[3]				 --@@ NEW! PSP
 	elseif tmpappcat==3 then
-	    tmpcatText = "PS1"
+	    tmpcatText = lang_lines[4]				 --@@ NEW! PS1
 	elseif tmpappcat==4 then
-	    tmpcatText = "Homebrew"
+	    tmpcatText = lang_lines[2]				 --@@ NEW! Homebrew
 	else
-	    tmpcatText = lang_lines[123]
+	    tmpcatText = lang_lines[121]			 --@@ NEW! Default
 	end
 
 	if xCatLookup(showCat)[p].launch_type == 0 then
 	    menuItems = 2
 	    Graphics.fillRect(24, 470, 350 + (menuY * 40), 390 + (menuY * 40), themeCol)-- selection
-	    Font.print(fnt22, 50, 352, lang_lines[120], white)
-	    Font.print(fnt22, 50, 352+40, lang_lines[121] .. ": < " .. tmpcatText .. " >", white)
-	    Font.print(fnt22, 50, 352+80, lang_lines[122], white)
+	    Font.print(fnt22, 50, 352, lang_lines[20], white)				 --@@ NEW! Download Cover
+	    Font.print(fnt22, 50, 352+40, lang_lines[120] .. tmpcatText .. ">", white)	 --@@ NEW! "Override Category: < " .. tmpcatText .. " >"
+	    Font.print(fnt22, 50, 352+80, lang_lines[122], white)			 --@@ NEW! Rename
 
 	    --if xCatLookup(showCat)[p].fave_heart == true then
 	    --    Graphics.drawImage(420, 50, imgFav_large_on)
@@ -2811,14 +2847,16 @@ while true do
 			status = Keyboard.getState()
 			if status ~= RUNNING then
 			    if hasTyped == false then
-				Keyboard.start("Rename. Leave blank to reset title.", sanitize(xCatLookup(showCat)[p].apptitle), 512, TYPE_LATIN, MODE_TEXT)
+				Keyboard.start(lang_lines[123], sanitize(xCatLookup(showCat)[p].apptitle), 512, TYPE_LATIN, MODE_TEXT)
+				--@@ NEW!      ^ "Rename. Leave blank to reset title."
 				hasTyped = true
 			    else
 				result_text = sanitize(Keyboard.getInput())
 				Keyboard.clear()
 				hasTyped = false
 				status = System.getMessageState()
-				if ("\"" .. result_text .. "\"") ~= string.format("%q", result_text) then
+				if (string.format("%q", result_text) ~= "\"" .. result_text .. "\"")
+				or (result_text == "-") then	 --@@ NEW! If an app is named this, it prevents launch and pressing triangle on it.
 				    -- %q format makes the string LUA compatible by 1: adding quotes to the end and 2: sanitizing any LUA-special characters...
 				    -- ...so if the string with added quotes DOESN'T equal the %q format output, it's not gonna go well with cache.
 				    System.setMessage("invalid title", false, BUTTON_OK)
@@ -2927,27 +2965,31 @@ while true do
 	end	
     elseif showMenu == 2 then
 
-	-- Set Setting Menu Tab Spacing. This bit of code is so ugly sorry >.<
-	if not toggle1X then
-	    if (Font.getTextWidth(fnt22, lang_lines[107] .. ": ")) > 260 then
-		toggle1X = (Font.getTextWidth(fnt22, lang_lines[107] .. ": ")) - 260 --Crop 'Vita' in View #5+
-	    else
-		toggle1X = 0
-	    end
+	-- Set Setting Menu Tab Spacing.
+    --@@if not toggle1X then
+    --@@    if (Font.getTextWidth(fnt22, lang_lines[107] .. ": ")) > 260 then
+    --@@	toggle1X = (Font.getTextWidth(fnt22, lang_lines[107] .. ": ")) - 260 --Crop 'Vita' in View #5+
+    --@@    else
+    --@@	toggle1X = 0
+    --@@    end
+	if not toggle2X then	 --@@ NEW!
 	    if (Font.getTextWidth(fnt22, lang_lines[99] .. ": ")) > 275 then
 		toggle2X = (Font.getTextWidth(fnt22, lang_lines[99] .. ": ")) - 275 --Hide Empty Categories
 	    else
 		toggle2X = 0
 	    end
 	end
-        -- SETTINGS
-        -- Footer buttons and icons. label X's are set in function ChangeLanguage()
-        Graphics.drawImage(label1AltImgX, 510, btnCancel)	 -- Used to be btnO
-        Font.print(fnt20, label1AltX, 508, lang_lines[11], white)--Close
-        Graphics.drawImage(label2AltImgX, 510, btnAccept)	 -- Used to be btnX
-        Font.print(fnt20, label2AltX, 508, lang_lines[32], white)--Select
-        Graphics.fillRect(60, 900, 24, 488, darkalpha)
-        Font.print(fnt22, 84, 34, lang_lines[6], white)--SETTINGS
+	-- SETTINGS
+	-- Footer buttons and icons. label X's are set in function ChangeLanguage()
+	Graphics.drawImage(label1AltImgX, 510, btnCancel)	 -- Used to be btnO
+--@@	Font.print(fnt20, label1AltX, 508, lang_lines[11], white)--Close
+	Font.print(fnt20, label1AltImgX + 28, 508, lang_lines[11], white)--Close
+	Graphics.drawImage(label2AltImgX, 510, btnAccept)	 -- Used to be btnX
+--@@	Font.print(fnt20, label2AltX, 508, lang_lines[32], white)--Select
+	Font.print(fnt20, label2AltImgX + 28, 508, lang_lines[32], white)--Select
+	Graphics.fillRect(60, 900, 24, 488, darkalpha)
+	Graphics.drawImage(84, 33, imgCog)				 --@@ NEW!
+	Font.print(fnt22, 84 + 36, 34, lang_lines[6], white)--SETTINGS	 --@@ NEW! +36 for imgCog
 	if menuY < 5 then
 	    Graphics.fillRect(60, 900, 77 + (menuY * 34), 112 + (menuY * 34), themeCol)-- selection
 	elseif menuY == 11 then
@@ -2987,11 +3029,9 @@ while true do
 	elseif themeColor == 7 then
 	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[30], white)--Orange
 	elseif themeColor == 6 then
-	--@@Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[29], white)
-	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[54], white)--@@ NEW! Pink
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[54], white)--Pink
 	elseif themeColor == 8 then
-	--@@Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[54], white)--Dark Purple
-	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[29], white)--@@ NEW! Purple @@ used to be called Dark Purple
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[29], white)--Purple
 	else
 	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[31], white)--Blue
 	end
@@ -3043,68 +3083,77 @@ while true do
 	end
         Font.print(fnt22, 84 + 260, 79 + 102, BGroundText, white)
 
---@@	Font.print(fnt22, 84, 79 + 136, lang_lines[21] .. ": ", white)--Language
-	Font.print(fnt22, 84, 79 + 136, lang_lines[21] .. ": ", lightgrey)--Language
-        if setLanguage == 1 then
-            Font.print(fnt22, 84 + 260, 79 + 136, "German", white)
-        elseif setLanguage == 2 then
-            Font.print(fnt22, 84 + 260, 79 + 136, "French", white)
-        elseif setLanguage == 3 then
-            Font.print(fnt22, 84 + 260, 79 + 136, "Italian", white)
-        elseif setLanguage == 4 then
-            Font.print(fnt22, 84 + 260, 79 + 136, "Spanish", white)
-        elseif setLanguage == 5 then
-            Font.print(fnt22, 84 + 260, 79 + 136, "Russian", white)
-        elseif setLanguage == 6 then
-            Font.print(fnt22, 84 + 260, 79 + 136, "Swedish", white)
-        elseif setLanguage == 7 then
-            Font.print(fnt22, 84 + 260, 79 + 136, "Portugese", white)
-        elseif setLanguage == 8 then
-            Font.print(fnt22, 84 + 260, 79 + 136, "Polish", white)
-        elseif setLanguage == 9 then
-            Font.print(fnt22, 84 + 260, 79 + 136, "Japanese", white)
-        elseif setLanguage == 10 then
-            Font.print(fnt22, 84 + 260, 79 + 136, "Chinese", white)
-        else
-            Font.print(fnt22, 84 + 260, 79 + 136, "English", white)
-        end
+	Font.print(fnt22, 84, 79 + 136, lang_lines[21] .. ": ", white)--Language
+--@@	Font.print(fnt22, 84, 79 + 136, lang_lines[21] .. ": ", lightgrey)--Language
+	Graphics.drawImage(84 + 260 - 40, 79 + 136 + 3, imgFlag)	 --@@ NEW!
+        Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[127], white)	 --@@ NEW! English/etc
+--@@        if setLanguage == 1 then
+--@@            Font.print(fnt22, 84 + 260, 79 + 136, "German", white)
+--@@        elseif setLanguage == 2 then
+--@@            Font.print(fnt22, 84 + 260, 79 + 136, "French", white)
+--@@        elseif setLanguage == 3 then
+--@@            Font.print(fnt22, 84 + 260, 79 + 136, "Italian", white)
+--@@        elseif setLanguage == 4 then
+--@@            Font.print(fnt22, 84 + 260, 79 + 136, "Spanish", white)
+--@@        elseif setLanguage == 5 then
+--@@            Font.print(fnt22, 84 + 260, 79 + 136, "Russian", white)
+--@@        elseif setLanguage == 6 then
+--@@            Font.print(fnt22, 84 + 260, 79 + 136, "Swedish", white)
+--@@        elseif setLanguage == 7 then
+--@@            Font.print(fnt22, 84 + 260, 79 + 136, "Portugese", white)
+--@@        elseif setLanguage == 8 then
+--@@            Font.print(fnt22, 84 + 260, 79 + 136, "Polish", white)
+--@@        elseif setLanguage == 9 then
+--@@            Font.print(fnt22, 84 + 260, 79 + 136, "Japanese", white)
+--@@        elseif setLanguage == 10 then
+--@@            Font.print(fnt22, 84 + 260, 79 + 136, "Chinese", white)
+--@@        else
+--@@            Font.print(fnt22, 84 + 260, 79 + 136, "English", white)
+--@@        end
 
 
 	Font.print(fnt22, 84, 79 + 170, lang_lines[16] .. ": ", white)--Music & Sounds
 	Graphics.drawImage(84 + 260 - 22, 79 + 170 + 4, imgMusic)
-        if setSounds == 0 then
-            Font.print(fnt22, 84 + 260, 79 + 170, lang_lines[23], white)--OFF
+	if setSounds == 0 then
+	    Font.print(fnt22, 84 + 260, 79 + 170, lang_lines[23], white)--OFF
 	    -- Graphics.drawLine(84 + 260 - 22, 84 + 260 - 2, 79 + 170 + 4, 79 + 170 + 24, white)
 	    -- Graphics.drawLine(84 + 260 - 21, 84 + 260 - 1, 79 + 170 + 4, 79 + 170 + 24, white)
 	    Graphics.drawLine(322, 342, 253, 273, white)
 	    Graphics.drawLine(323, 343, 253, 273, white)
 	elseif not cur_quick_dir["music.mp3"] and not cur_quick_dir["music.ogg"] then
-            Font.print(fnt22, 84 + 260, 79 + 170, lang_lines[22], white)--ON
+	    Font.print(fnt22, 84 + 260, 79 + 170, lang_lines[22], white)--ON
 	elseif musicLoop == 1 then
-            Font.print(fnt22, 84 + 260, 79 + 170, lang_lines[90], white)--Music: Loop
-        else
-            Font.print(fnt22, 84 + 260, 79 + 170, "1x", white)
-        end
-        Font.print(fnt22, 484, 79 + 170, lang_lines[100] .. ": ", white)--Category Button
+	    Font.print(fnt22, 84 + 260, 79 + 170, lang_lines[90], white)--Music: Loop
+	else
+	    Font.print(fnt22, 84 + 260, 79 + 170, "1x", white)
+	end
+	Font.print(fnt22, 484, 79 + 170, lang_lines[100] .. ": ", white)--Category Button
 	if categoryButton == 1 then
 	    Graphics.drawImage(484 + 275, 79 + 170 + 4, btnD)
 	elseif categoryButton == 2 then
 	    Graphics.drawImage(484 +  275 + 2, 79 + 170 + 4, imgArrows)		 -- up/down arrows png
 	elseif categoryButton == 3 then
 	    Graphics.drawImage(484 + 275, 79 + 170 + 4, btnS)
-            Font.print(fnt22, 484 + 275 + 22, 79 + 170 + 1, "/", white)
-            Font.print(fnt20, 484 + 275 + 35, 79 + 170 + 4, "▼", white)	 -- large down arrow. Note: large up arrow is ▲
+	    Font.print(fnt22, 484 + 275 + 22, 79 + 170 + 1, "/", white)
+--@@	    Font.print(fnt20, 484 + 275 + 35, 79 + 170 + 4, "▼", white)
+	    if setLanguage == 11 then						 --@@ Cheap hotfix for Chinese Simplified
+		Graphics.debugPrint(484 + 275 + 35, 79 + 170 + 4, "▼", white)	 --@@ Cheap hotfix for Chinese Simplified
+	    else								 --@@ Cheap hotfix for Chinese Simplified
+		Font.print(fnt20, 484 + 275 + 35, 79 + 170 + 4, "▼", white)	 -- large down arrow. Note: large up arrow is ▲
+	    end									 --@@ Cheap hotfix for Chinese Simplified
 	    Graphics.drawImage(484 + 275 + 58, 79 + 170 + 4, btnS)
-        else
+	else
 	    Graphics.drawImage(484 + 275, 79 + 170 + 4, btnS)
-        end
+	end
 
                 Font.print(fnt22, 84, 79 + 204, lang_lines[15] .. ": ", white)--Reflection Effect
         if setReflections == 1 then
-            Font.print(fnt22, 84 + 260 + toggle1X, 79 + 204, lang_lines[22], white)--ON
+            Font.print(fnt22, 84 + 260, 79 + 204, lang_lines[22], white)--ON
         else
-            Font.print(fnt22, 84 + 260 + toggle1X, 79 + 204, lang_lines[23], white)--OFF
+            Font.print(fnt22, 84 + 260, 79 + 204, lang_lines[23], white)--OFF
         end
+    --@@Graphics.drawImage(484, 79 + 204 + 2, imgCache)
+    --@@Font.print(fnt22, 484 + 34, 79 + 204, lang_lines[96] .. ": ", white)--RetroFlow
         Font.print(fnt22, 484, 79 + 204, lang_lines[96] .. ": ", white)--RetroFlow
         if setRetroFlow == 1 then
             Font.print(fnt22, 484 + toggle2X + 275, 79 + 204, lang_lines[22], white)--ON
@@ -3114,9 +3163,9 @@ while true do
 		
         Font.print(fnt22, 84, 79 + 238, lang_lines[46] .. ": ", white)--Show Homebrews
 	if showHomebrews == 1 then
-            Font.print(fnt22, 84 + 260 + toggle1X, 79 + 238, lang_lines[22], white)--ON
+            Font.print(fnt22, 84 + 260, 79 + 238, lang_lines[22], white)--ON
         else
-            Font.print(fnt22, 84 + 260 + toggle1X, 79 + 238, lang_lines[23], white)--OFF
+            Font.print(fnt22, 84 + 260, 79 + 238, lang_lines[23], white)--OFF
         end
         Font.print(fnt22, 484, 79 + 238, lang_lines[99] .. ": ", white)--Hide Empty Categories
 	if hideEmptyCats == 1 then
@@ -3127,9 +3176,9 @@ while true do
 
         Font.print(fnt22, 84, 79 + 272, lang_lines[108] .. ": ", white)--Recently Played
         if showRecentlyPlayed == 1 then
-            Font.print(fnt22, 84 + 260 + toggle1X, 79 + 272, lang_lines[22], white)--ON
+            Font.print(fnt22, 84 + 260, 79 + 272, lang_lines[22], white)--ON
         else
-            Font.print(fnt22, 84 + 260 + toggle1X, 79 + 272, lang_lines[23], white)--OFF
+            Font.print(fnt22, 84 + 260, 79 + 272, lang_lines[23], white)--OFF
         end
         Font.print(fnt22, 484, 79 + 272, lang_lines[94] .. ": ", white)--Lock Current View (#*)
         if lockView == 1 then
@@ -3140,20 +3189,20 @@ while true do
         
         Font.print(fnt22, 84, 79 + 306, lang_lines[91] .. ": ", white)--Allow View #5/#6
 	if setSwitch == 1 then
-	    Font.print(fnt22, 84 + 260 + toggle1X, 79 + 306, lang_lines[22], white)--ON
+	    Font.print(fnt22, 84 + 260, 79 + 306, lang_lines[22], white)--ON
 	    Font.print(fnt22, 84, 79 + 340, lang_lines[107] .. ": ", white)--Crop 'Vita' in View #5
 	    if View5VitaCropTop == 1 then
-		Font.print(fnt22, 84 + 260 + toggle1X, 79 + 340, lang_lines[22], white)--ON
+		Font.print(fnt22, 84 + 260, 79 + 340, lang_lines[22], white)--ON
 	    else
-		Font.print(fnt22, 84 + 260 + toggle1X, 79 + 340, lang_lines[23], white)--OFF
+		Font.print(fnt22, 84 + 260, 79 + 340, lang_lines[23], white)--OFF
 	    end
 	else
-	    Font.print(fnt22, 84 + 260 + toggle1X, 79 + 306, lang_lines[23], white)--OFF
+	    Font.print(fnt22, 84 + 260, 79 + 306, lang_lines[23], white)--OFF
 	    Font.print(fnt22, 84, 79 + 340, lang_lines[107] .. ": ", lightgrey)--Crop 'Vita' in View #5
 	    if View5VitaCropTop == 1 then
-		Font.print(fnt22, 84 + 260 + toggle1X, 79 + 340, lang_lines[22], lightgrey)--ON
+		Font.print(fnt22, 84 + 260, 79 + 340, lang_lines[22], lightgrey)--ON
 	    else
-		Font.print(fnt22, 84 + 260 + toggle1X, 79 + 340, lang_lines[23], lightgrey)--OFF
+		Font.print(fnt22, 84 + 260, 79 + 340, lang_lines[23], lightgrey)--OFF
 	    end
 	end
 
@@ -3185,30 +3234,30 @@ while true do
                   --if startCategory < 7 then
 		    if (setRetroFlow==1 and startCategory<38)
 		    or (setRetroFlow~=1 and startCategory<7) then
-                        startCategory = startCategory + 1
-                    else
-                        startCategory = 0
-                    end
-                elseif menuY == 1 then
-                    if themeColor == 5 then	 -- cheap reorder hack to maintain HEXFlow Launcher 0.5 compatibility.
-                        themeColor = 7
-                    elseif themeColor == 7 then
-                        themeColor = 6
-                    elseif themeColor == 6 then
-                        themeColor = 8
-                    elseif themeColor < 5 then   -- normally "elseif themeColor < 7 then"
-                        themeColor = themeColor + 1
-                    else
-                        themeColor = 0
-                    end
-                    SetThemeColor()
-                elseif menuY == 2 then
-                    if gettingCovers == false then
-                        gettingCovers = true
-                        DownloadCategoryCovers()
-                    end
-                elseif menuY == 3 then
-                    if (setBackground == 0) and (getBGround == 0) then	 -- "OFF" becomes "<ON>"
+		        startCategory = startCategory + 1
+		    else
+		        startCategory = 0
+		    end
+		elseif menuY == 1 then
+		    if themeColor == 5 then	 -- cheap reorder hack to maintain HEXFlow Launcher 0.5 compatibility.
+			themeColor = 7
+		    elseif themeColor == 7 then
+			themeColor = 6
+		    elseif themeColor == 6 then
+			themeColor = 8
+		    elseif themeColor < 5 then   -- normally "elseif themeColor < 7 then"
+			themeColor = themeColor + 1
+		    else
+			themeColor = 0
+		    end
+		    SetThemeColor()
+		elseif menuY == 2 then
+		    if gettingCovers == false then
+			gettingCovers = true
+			DownloadCategoryCovers()
+		    end
+		elseif menuY == 3 then
+		    if (setBackground == 0) and (getBGround == 0) then	 -- "OFF" becomes "<ON>"
 			setBackground, getBGround = 1, 1
 			background_brackets = true
 		    else
@@ -3221,12 +3270,13 @@ while true do
 		    end
 		    ApplyBackground(setBackground)
                 elseif menuY == 4 then
---@@		    if setLanguage < 9 then
---@@                        setLanguage = setLanguage + 1
---@@                    else
---@@                        setLanguage = 0
---@@                    end
---@@		    ChangeLanguage()
+		    if setLanguage < 19 then	 --@@ NEW! 10 new languages
+			setLanguage = setLanguage + 1
+		    else
+			setLanguage = 0
+		    end
+		    ChangeLanguage()
+		    imgFlag = Graphics.loadImage("app0:/translations/" .. lang .. ".png")
                 elseif menuY == 5 then
 		    if menuX == 0 then
 			if Sound.isPlaying(sndMusic) then
@@ -3253,7 +3303,7 @@ while true do
 			end
 			ChangeLanguage()	 -- refresh footer button spacing if using "category button: up/down"
 		    end
-                elseif menuY == 6 then
+		elseif menuY == 6 then
 		    if menuX == 0 then
 			if setReflections == 1 then
 			    setReflections = 0
@@ -3474,25 +3524,27 @@ while true do
 	end
     elseif showMenu == 3 then
         
-        -- More Information / About
-        -- Footer buttons and icons. label X's are set in ChangeLanguage()
-        Graphics.drawImage(label1AltImgX, 510, btnCancel)	 -- Used to be btnO
-        Font.print(fnt20, label1AltX, 508, lang_lines[11], white)--Close
-        
-        Graphics.fillRect(30, 930, 24, 496, darkalpha)-- bg
-        
-        Font.print(fnt20, 54, 42, "HexFlow Custom - version " .. appversion .. " by BlackSheepBoy69\nRevamp mod for VitaHEX's HexFlow Launcher 0.5\nSupport the original creator on patreon.com/vitahex", white)-- Draw info
-        Font.print(fnt15, 690, 42, "Sort time: ".. sortTime .. " ms.\nRead time: ".. applistReadTime .. " ms.\nFunction Load time: ".. functionTime .. " ms.\nOne Loop time: ".. oneLoopTime .. " ms.", white)
-        Graphics.drawLine(30, 930, 124, 124, white)
-        Graphics.drawLine(30, 930, 384, 384, white)
-        Font.print(fnt20, 54, 132, "Custom Backgrounds & Music\nIn 'ux0:/data/HexFlow/', place your image - 'background.png' or 'background.jpg'\n(1280x720 max) and song - 'music.ogg'. Unlocks setting 'Music & Sounds: Loop/Play 1x'"
-            .. "\n\nCustom Covers & RetroFlow (requires 'RetroFlow' installed)\nPlace your custom covers in 'ux0:/data/HexFlow/COVERS/PSVITA' or '/PSP' or '/PS1'\nCover images must be in png format and file name must match the App ID or App Name.\nRespectively, 'RetroFlow: ON' lets it read from 'ux0:data/RetroFlow/COVERS' and '/ROMS'"
-            .. "\n\nCustom Category\nTake the file 'ux0:/data/HexFlow/applist.dat' and rename it to customsort.dat then\nrearrange the titles how you like. It will spawn in a new category ('Custom')"
-            .. "\n\nCredit to VitaHEX, Sakis RG, and everyone who worked on HexFlow Launcher 0.5 which"
-            .. "\nthis is based on, jimbob4000 and everyone who worked on RetroFlow Launcher 5.0.2, for"
-            .. "\ngeneral support/inspiration, Rinnegatamante for Lua Player Plus, Axce, Fwannmacher"
-            .. "\nDaRk_ViVi, yzzyx-network, all translator, and one or more coders anonymous.", white)-- Draw info
-    
+	-- More Information / About
+	-- Footer buttons and icons. label X's are set in ChangeLanguage()
+	Graphics.drawImage(label1AltImgX, 510, btnCancel)	 -- Used to be btnO
+--@@	Font.print(fnt20, label1AltX, 508, lang_lines[11], white)--Close
+	Font.print(fnt20, label1AltImgX + 28, 508, lang_lines[11], white)--Close
+
+
+	Graphics.fillRect(30, 930, 24, 496, darkalpha)-- bg
+
+	Font.print(fnt20, 54, 42, "HexFlow Custom - version " .. appversion .. " by BlackSheepBoy69\nRevamp mod for VitaHEX's HexFlow Launcher 0.5\nSupport the original creator on patreon.com/vitahex", white)-- Draw info
+	Font.print(fnt15, 690, 42, "Sort time: ".. sortTime .. " ms.\nRead time: ".. applistReadTime .. " ms.\nFunction Load time: ".. functionTime .. " ms.\nOne Loop time: ".. oneLoopTime .. " ms.", white)
+	Graphics.drawLine(30, 930, 124, 124, white)
+	Graphics.drawLine(30, 930, 384, 384, white)
+	Font.print(fnt20, 54, 132, "Custom Backgrounds & Music\nIn 'ux0:/data/HexFlow/', place your image - 'background.png' or 'background.jpg'\n(1280x720 max) and song - 'music.ogg'. Unlocks setting 'Music & Sounds: Loop/Play 1x'"
+	    .. "\n\nCustom Covers & RetroFlow (requires 'RetroFlow' installed)\nPlace your custom covers in 'ux0:/data/HexFlow/COVERS/PSVITA' or '/PSP' or '/PS1'\nCover images must be in png format and file name must match the App ID or App Name.\nRespectively, 'RetroFlow: ON' lets it read from 'ux0:data/RetroFlow/COVERS' and '/ROMS'"
+	    .. "\n\nCustom Category\nTake the file 'ux0:/data/HexFlow/applist.dat' and rename it to customsort.dat then\nrearrange the titles how you like. It will spawn in a new category ('Custom')"
+	    .. "\n\nCredit to VitaHEX, Sakis RG, and everyone who worked on HexFlow Launcher 0.5 which"
+	    .. "\nthis is based on, jimbob4000 and everyone who worked on RetroFlow Launcher 5.0.2, for"
+	    .. "\ngeneral support/inspiration, Rinnegatamante for Lua Player Plus, Axce, Fwannmacher"
+	    .. "\nDaRk_ViVi, yzzyx-network, all translators, and one or more coders anonymous.", white)-- Draw info
+
     end
     
     -- Terminating rendering phase
@@ -3671,6 +3723,7 @@ while true do
         elseif (Controls.check(pad, SCE_CTRL_START) and not Controls.check(oldpad, SCE_CTRL_START)) then
             if showMenu == 0 then
 		imgMusic = Graphics.loadImage("app0:/DATA/music_note.png")
+		imgCog = Graphics.loadImage("app0:/DATA/setting-icon-cog.png")
 		getBGround = setBackground
 		background_brackets = true
 		inPreview = false	 -- Probably not necessary
@@ -3776,21 +3829,21 @@ while true do
 		p_plus(5)
 	    end
 	elseif (Controls.check(pad,SCE_CTRL_UP)) and not (Controls.check(oldpad,SCE_CTRL_UP)) then
-	    if showView==5 and bottomMenu==true then
+	    if showView == 5 and bottomMenu == true then
 		bottomMenu = false
 		if setSounds == 1 then
 		    Sound.play(click, NO_LOOP)
 		end
-	    elseif showView==6 then
+	    elseif showView == 6 then
 		p_minus(6)
 	    end
 	elseif (Controls.check(pad,SCE_CTRL_DOWN)) and not (Controls.check(oldpad,SCE_CTRL_DOWN)) then
-	    if showView==5 and bottomMenu==false then
+	    if showView == 5 and bottomMenu == false then
 		bottomMenu = true
 		if setSounds == 1 then
 		    Sound.play(click, NO_LOOP)
 		end
-	    elseif showView==6 then
+	    elseif showView == 6 then
 		p_plus(6)
 	    end
 	end
