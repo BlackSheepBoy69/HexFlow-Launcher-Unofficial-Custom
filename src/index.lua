@@ -1,4 +1,4 @@
-﻿-- HexFlow Launcher Custom version 2.4
+﻿-- HexFlow Launcher Custom version 2.4.1
 -- based on VitaHEX's HexFlow Launcher v0.5 + SwitchView UI v0.1.2 + jimbob4000's Retroflow v5.0.2
 -- https://www.patreon.com/vitahex
 -- Want to make your own version? Right-click the vpk and select "Open with... Winrar" and edit the index.lua inside.
@@ -11,7 +11,7 @@ local sortTime = 0
 
 dofile("app0:addons/threads.lua")
 local working_dir = "ux0:/app"
-local appversion = "2.4"
+local appversion = "2.4.1"
 function System.currentDirectory(dir)
     if dir == nil then
         return working_dir --"ux0:/app"
@@ -56,22 +56,14 @@ local CTRL_CANCEL = SCE_CTRL_CIRCLE
 
 -- Footer button margins
 local btnMargin = 44	 -- Retroflow: 64. HEXFlow: ~46
---@@local btnImgWidth = 20	 -- width of btnX/etc for spacing calculations.
 
 -- Footer button X coordinates. Calculated in changeLanguage(). Alts are for start menu.
 local label1AltImgX = 0
 local label2AltImgX = 0
---@@local label1AltX = 0
---@@local label2AltX = 0
 local label1ImgX = 0
 local label2ImgX = 0
 local label3ImgX = 0
 local label4ImgX = 0
---@@local label1X = 0
---@@local label2X = 0
---@@local label3X = 0
---@@local label4X = 0
---@@local toggle1X = nil
 local toggle2X = nil
 
 local spin_allowance = 0
@@ -415,17 +407,15 @@ function load_RetroFlow()
     RetroflowAssetsAreLoaded = true
 end
 
-local fontfile = "app0:/DATA/font.woff"		 --@@ NEW!
-local fontfile_old = ""				 --@@ NEW! Not necessary if language is made unchangeable
-local fnt15					 --@@ NEW! (1/5) Hopefully these locals being nul doesn't cause issues
-local fnt20					 --@@ NEW! (2/5)
-local fnt22					 --@@ NEW! (3/5)
-local fnt23_5					 --@@ NEW! (4/5)
-local fnt25					 --@@ NEW! (5/5)
+local fontfile = "app0:/DATA/font.woff"
+local fontfile_old = ""						 -- Not necessary if language is made unchangeable
+local fnt15							 -- Hopefully these locals being nul doesn't cause issues
+local fnt20
+local fnt22
+local fnt23_5
+local fnt25
 
 function load_SwitchView()
---@@fnt23_5 = Font.load("app0:/DATA/font.woff")	 --@@ Moved to ChangeLanguage()
---@@Font.setPixelSizes(fnt23_5, 23.5)		 --@@ Moved to ChangeLanguage()
     imgCart = Graphics.loadImage("app0:/DATA/cart.png")
     --imgAvatar = Graphics.loadImage("app0:/AVATARS/AV01.png")
     --imgCont = Graphics.loadImage("app0:/DATA/cont.png")
@@ -441,20 +431,9 @@ function load_SwitchView()
     SwitchviewAssetsAreLoaded = true
 end
 
---@@ MOVED
---@@local fnt15 = Font.load("app0:/DATA/font.woff")
---@@local fnt20 = Font.load("app0:/DATA/font.woff")
---@@local fnt22 = Font.load("app0:/DATA/font.woff")
---@@local fnt25 = Font.load("app0:/DATA/font.woff")
---@@
---@@Font.setPixelSizes(fnt15, 15)
---@@Font.setPixelSizes(fnt20, 20)
---@@Font.setPixelSizes(fnt22, 22)
---@@Font.setPixelSizes(fnt25, 25)
-
 function sanitize(some_data)
     some_data = tostring(some_data)
-    return some_data:gsub("\r", ""):gsub("\n", " "):gsub("\t", " "):gsub("%c","")	 --@@ NEW! Now filters control (invisible) characters
+    return some_data:gsub("\r", ""):gsub("\n", " "):gsub("\t", " "):gsub("%c","")
 end
 
 local menuX = 0
@@ -558,7 +537,7 @@ local musicLoop = 1
 local themeColor = 0 -- 0 blue, 1 red, 2 yellow, 3 green, 4 grey, 5 black, 7 orange, 6 purple, 8 darkpurple. (reorder hack) 
 local menuItems = 3 
 local setBackground = 1 
-local setLanguage = System.getLanguage()	 --@@ NEW! Used to be 0
+local setLanguage = System.getLanguage()	 -- 0 Japanese, 1 English, etc
 local showHomebrews = 0 
 local setSwitch = 0
 local setRetroFlow = 0
@@ -642,36 +621,6 @@ function readBin(filename, allow_iso_scan)	 -- returns a string or nil
 	return path_game:upper()			 -- Example: SLUS00453
     end
 end
-
---@@    local getLanguage = System.getLanguage()	 --@@ MOVED UP
-
---@@ REMOVED. Unnecessary now that all languages are supported
---@@    if getLanguage == 0 then
---@@	setLanguage = 9		 -- Japanese
---@@  --elseif (getLanguage == 1) or (getLanguage == 18) then	 -- 1=AmericanEnglish, 18=British
---@@  --	setLanguage = 0		 -- American English
---@@    elseif getLanguage == 2 then
---@@	setLanguage = 2		 -- French
---@@    elseif (getLanguage == 3) or (getLanguage == 20) then	 -- 3=Spanish, 20=SpanishLatin
---@@	setLanguage = 4		 -- Spanish
---@@    elseif getLanguage == 4 then
---@@	setLanguage = 1		 -- German
---@@    elseif getLanguage == 5 then
---@@	setLanguage = 3		 -- Italian
---@@    elseif (getLanguage == 7) or (getLanguage == 17) then	 -- 7=PortugeseTrad, 17=PortugeseBrazil
---@@	setLanguage = 7		 -- Portugese
---@@    elseif getLanguage == 8 then
---@@	setLanguage = 5		 -- Russian
---@@    elseif getLanguage == 13 then
---@@	setLanguage = 6		 -- Swedish
---@@    elseif getLanguage == 16 then
---@@	setLanguage = 8		 -- Polish
---@@    elseif getLanguage == 16 then
---@@	setLanguage = 8		 -- Polish
---@@    end	 -- Don't change what language is set if a system language has no co-responding HexFlow Custom language. These languages are as follows:
---@@	 -- 6=Dutch, 9=Korean, 10=ChineseTrad, 11=ChineseSimple, 12=Finnish, 14=Danish, 15=Norwegian, 19=Turkish
---@@	 -- Languages with no system language values which are should be imported from RetroFlow: Hungarian, Japanese Ryukyuan.
-
 
 if Controls.getEnterButton() == SCE_CTRL_CIRCLE then
     swapXO = 1
@@ -834,37 +783,35 @@ function ChangeLanguage()
         System.writeFile(handle, "" .. lang_default, string.len(lang_default))
         System.closeFile(handle)
 	langfile = "ux0:/data/HexFlow/EN.ini"
-        setLanguage = 18			 --@@ NEW! 18 for English (United Kingdom). Used to be 0 for HexFlow "English" (ambiguous)
+        setLanguage = 18			 -- 18 for English (United Kingdom). Used to be 0 for HexFlow "English" (ambiguous)
     end
 
     if lang == "KO" then
-	fontfile = "app0:/DATA/font_KO.otf"	 --@@ NotoSansCJK KR Regular Slim
+	fontfile = "app0:/DATA/font_KO.otf"	 -- NotoSansCJK KR Regular Slim
     elseif lang == "CN_S" then
-	fontfile = "app0:/DATA/font_CN_S.otf"	 --@@ NotoSansCJK SC Regular Slim
+	fontfile = "app0:/DATA/font_CN_S.otf"	 -- NotoSansCJK SC Regular Slim
     elseif lang == "CN_T" then
-	fontfile = "app0:/DATA/font_CN_T.otf"	 --@@ NotoSansCJK TC Regular
+	fontfile = "app0:/DATA/font_CN_T.otf"	 -- NotoSansCJK TC Regular
     else
-	fontfile = "app0:/DATA/font.woff"	 --@@ Sawarabi Gothic Regular
+	fontfile = "app0:/DATA/font.woff"	 -- Sawarabi Gothic Regular
     end
 
-    if fontfile_old ~= fontfile then		 --@@ Not necessary if language is made unchangeable
+    if fontfile_old ~= fontfile then		 -- Not necessary if language is made unchangeable
 	fnt15 = Font.load(fontfile)
 	fnt20 = Font.load(fontfile)
 	fnt22 = Font.load(fontfile)
-	fnt23_5 = Font.load(fontfile)		 --@@ For SwitchView
+	fnt23_5 = Font.load(fontfile)		 -- For SwitchView
 	fnt25 = Font.load(fontfile)
 
 	Font.setPixelSizes(fnt15, 15)
 	Font.setPixelSizes(fnt20, 20)
 	Font.setPixelSizes(fnt22, 22)
-	Font.setPixelSizes(fnt23_5, 23.5)	 --@@ For SwitchView
+	Font.setPixelSizes(fnt23_5, 23.5)	 -- For SwitchView
 	Font.setPixelSizes(fnt25, 25)
-    end						 --@@ Not necessary if language is made unchangeable
-    fontfile_old = fontfile			 --@@ Not necessary if language is made unchangeable
+    end						 -- Not necessary if language is made unchangeable
+    fontfile_old = fontfile			 -- Not necessary if language is made unchangeable
 
---@@for line in io.lines("app0:/translations/" .. lang .. ".ini") do
     for line in io.lines(langfile) do
-    --@@lang_lines[#lang_lines+1] = line
 	table.insert(lang_lines, line)
     end
 
@@ -875,26 +822,20 @@ function ChangeLanguage()
   --end
 
 --Set footer button spacing.   btnMargin: 44    btnImgWidth: 20    8px img-text buffer.
-    label1ImgX = 904-Font.getTextWidth(fnt20, lang_lines[7])			 --X
---@@label1X = label1ImgX+btnImgWidth+8						 --Launch
-    label2ImgX = label1ImgX-(Font.getTextWidth(fnt20, lang_lines[8])+btnMargin)	 --Tri
---@@label2X = label2ImgX+btnImgWidth+8						 --Details
-    label3ImgX = label2ImgX-(Font.getTextWidth(fnt20, lang_lines[9])+btnMargin)	 --Box
---@@label3X = label3ImgX+btnImgWidth+8						 --Category
+    label1ImgX = 904-Font.getTextWidth(fnt20, lang_lines[7])				 --X:   Launch
+    label2ImgX = label1ImgX-(Font.getTextWidth(fnt20, lang_lines[8])+btnMargin)		 --Tri: Details
+    label3ImgX = label2ImgX-(Font.getTextWidth(fnt20, lang_lines[9])+btnMargin)		 --Box: Category
     if categoryButton == 2 then
-	label4ImgX = label2ImgX-(Font.getTextWidth(fnt20, lang_lines[10])+btnMargin) --O
+	label4ImgX = label2ImgX-(Font.getTextWidth(fnt20, lang_lines[10])+btnMargin)	 --O:   View
     else
-	label4ImgX = label3ImgX-(Font.getTextWidth(fnt20, lang_lines[10])+btnMargin) --O
+	label4ImgX = label3ImgX-(Font.getTextWidth(fnt20, lang_lines[10])+btnMargin)	 --O:   View
     end
---@@label4X = label4ImgX+btnImgWidth+8						 --View
 
-    label1AltImgX = 900-Font.getTextWidth(fnt20, lang_lines[11])			--O
---@@label1AltX = label1AltImgX+btnImgWidth+8						--Close
-    label2AltImgX = label1AltImgX-(Font.getTextWidth(fnt20, lang_lines[32])+btnMargin)	--X
---@@label2AltX = label2AltImgX+btnImgWidth+8						--Select
+    label1AltImgX = 900-Font.getTextWidth(fnt20, lang_lines[11])			--O:   Close
+    label2AltImgX = label1AltImgX-(Font.getTextWidth(fnt20, lang_lines[32])+btnMargin)	--X:   Select
     
---@@toggle1X = nil
-    toggle2X = nil	 --@@ NEW!
+  --toggle1X = nil
+    toggle2X = nil
 end
 ChangeLanguage()
 local imgFlag = Graphics.loadImage("app0:/translations/" .. lang .. ".png")
@@ -1996,7 +1937,7 @@ function DownloadCategoryCovers()
 
     if status ~= RUNNING then
 	if not Network.isWifiEnabled() then
-	    System.setMessage(lang_lines[124], false, BUTTON_OK)	 --@@ NEW! Internet Connection Required
+	    System.setMessage(lang_lines[124], false, BUTTON_OK) -- Internet Connection Required
 	else
 	    System.setMessage("Downloading covers...", true)
 	    System.setMessageProgMsg("Downloading covers...")
@@ -2005,14 +1946,13 @@ function DownloadCategoryCovers()
 		and DownloadCover(xCatLookup(getCovers)[i]) then
 		    cvrfound = cvrfound + 1
 		end
-		Graphics.initBlend()					 -- one of these sets of initBlend/termBlend/Screen.flip()'s might not be necessary.
+		Graphics.initBlend()				 -- one of these sets of initBlend/termBlend/Screen.flip()'s might not be necessary.
 		Graphics.termBlend()
 		Screen.flip()
 
 		System.setMessageProgress(i / #xCatLookup(getCovers) * 100)
-		System.setMessageProgMsg("Downloading " .. xTextLookup(getCovers) .. " covers...\nCover " .. xCatLookup(getCovers)[i].name .. "\nFound " .. cvrfound .. " of " .. #xCatLookup(getCovers))
-		--@@ Not sure why the below line isn't working
---@@		System.setMessageProgMsg(lang_lines[51]:gsub("*", xTextLookup(getCovers)) .. "...\n" .. xCatLookup(getCovers)[i].name .. "\n" lang_lines[53]:gsub("*", cvrfound .. " / " .. #xCatLookup(getCovers)))
+--@@		System.setMessageProgMsg("Downloading " .. xTextLookup(getCovers) .. " covers...\nCover " .. xCatLookup(getCovers)[i].name .. "\nFound " .. cvrfound .. " of " .. #xCatLookup(getCovers))
+		System.setMessageProgMsg(lang_lines[51]:gsub("*", xTextLookup(getCovers)) .. "...\n" .. xCatLookup(getCovers)[i].name .. "\n" .. lang_lines[53]:gsub("*", cvrfound .. " / " .. #xCatLookup(getCovers)))	 --@@ NEW!
 
 		Graphics.initBlend()
 		Graphics.termBlend()
@@ -2293,7 +2233,7 @@ function DownloadSingleCover()
 
     if status ~= RUNNING then
 	if not Network.isWifiEnabled() then
-	    System.setMessage(lang_lines[124], false, BUTTON_OK)	 --@@ NEW! Internet Connection Required
+	    System.setMessage(lang_lines[124], false, BUTTON_OK) -- Internet Connection Required
 	elseif DownloadCover(xCatLookup(showCat)[p]) then
 	    Threads.addTask(xCatLookup(showCat)[p], {
 	    Type = "ImageLoad",
@@ -2303,7 +2243,7 @@ function DownloadSingleCover()
 	    })
 	    System.setMessage(lang_lines[56]:gsub("*", DISC_ID or xCatLookup(showCat)[p].name), false, BUTTON_OK) --Cover XXXXXXXXX found!
 	else
-	    System.setMessage(lang_lines[54], false, BUTTON_OK)		 --@@ NEW! Cover not found
+	    System.setMessage(lang_lines[54], false, BUTTON_OK)	 -- Cover not found
 	end
     end
     gettingCovers = false
@@ -2315,13 +2255,13 @@ function DownloadSingleSnap()
 
     if status ~= RUNNING then
 	if not Network.isWifiEnabled() then
-	    System.setMessage(lang_lines[124], false, BUTTON_OK)	 --@@ NEW! Internet Connection Required
+	    System.setMessage(lang_lines[124], false, BUTTON_OK) -- Internet Connection Required
 	elseif not (setBackground > 0.5) then
 	    System.setMessage(lang_lines[18] .. ": " .. lang_lines[23], false, BUTTON_OK) --Custom Background OFF
 	elseif DownloadSnap(xCatLookup(showCat)[p]) then
 	    System.setMessage(lang_lines[56]:gsub("*", DISC_ID or xCatLookup(showCat)[p].name), false, BUTTON_OK) --Cover XXXXXXXXX found!
 	else
-	    System.setMessage(lang_lines[54], false, BUTTON_OK)		 --@@ NEW! Cover not found
+	    System.setMessage(lang_lines[54], false, BUTTON_OK)	 -- Cover not found
 	end
     end
     gettingCovers = false
@@ -2622,15 +2562,12 @@ while true do
 	end
 	-- Footer buttons and icons. X positions set in ChangeLanguage()
 	Graphics.drawImage(label1ImgX, 510, btnAccept)	 -- Used to be btnX
---@@	Font.print(fnt20, label1X, 508, lang_lines[7], white)--Launch
 	Font.print(fnt20, label1ImgX + 28, 508, lang_lines[7], white)--Launch
 	Graphics.drawImage(label2ImgX, 510, btnT)
---@@	Font.print(fnt20, label2X, 508, lang_lines[8], white)--Details
 	Font.print(fnt20, label2ImgX + 28, 508, lang_lines[8], white)--Details
 	if categoryButton == 1 then
 	    Graphics.drawImage(label3ImgX, 510, btnD)
 	    Font.print(fnt22, 32, 34, xTextLookup(showCat), white)--PS VITA/HOMEBREWS/PSP/PSX/CUSTOM/ALL
---@@	    Font.print(fnt20, label3X, 508, lang_lines[9], white)--Category
 	    Font.print(fnt20, label3ImgX + 28, 508, lang_lines[9], white)--Category
 	elseif categoryButton == 2 then
 	    Graphics.drawImage(34, 37, imgArrows)
@@ -2638,12 +2575,10 @@ while true do
 	else
 	    Graphics.drawImage(label3ImgX, 510, btnS)
 	    Font.print(fnt22, 32, 34, xTextLookup(showCat), white)--PS VITA/HOMEBREWS/PSP/PSX/CUSTOM/ALL
---@@	    Font.print(fnt20, label3X, 508, lang_lines[9], white)--Category
 	    Font.print(fnt20, label3ImgX + 28, 508, lang_lines[9], white)--Category
 	end
 	if lockView == 0 then
 	    Graphics.drawImage(label4ImgX, 510, btnCancel)	 -- Used to be btnO
---@@	    Font.print(fnt20, label4X, 508, lang_lines[10], white)--View
 	    Font.print(fnt20, label4ImgX + 28, 508, lang_lines[10], white)--View
 	end
 
@@ -2728,12 +2663,10 @@ while true do
         
 	-- PREVIEW
 	-- Footer buttons and icons. positions set in ChangeLanguage()
-	Graphics.drawImage(label1AltImgX, 510, btnCancel)	 -- Used to be btnO
---@@    Font.print(fnt20, label1AltX, 508, lang_lines[11], white)--Close
-	Font.print(fnt20, label1AltImgX + 28, 508, lang_lines[11], white)--Close
-	Graphics.drawImage(label2AltImgX, 510, btnAccept)	 -- Used to be btnX
---@@    Font.print(fnt20, label2AltX, 508, lang_lines[32], white)--Select
-	Font.print(fnt20, label2AltImgX + 28, 508, lang_lines[32], white)--Select
+	Graphics.drawImage(label1AltImgX, 510, btnCancel)		  -- Used to be btnO
+	Font.print(fnt20, label1AltImgX + 28, 508, lang_lines[11], white) -- Close
+	Graphics.drawImage(label2AltImgX, 510, btnAccept)		  -- Used to be btnX
+	Font.print(fnt20, label2AltImgX + 28, 508, lang_lines[32], white) -- Select
 
 	Graphics.fillRect(24, 470, 24, 470, darkalpha)
 	Render.setCamera(0, 0, 0, 0.0, 0.0, 0.0)
@@ -2799,23 +2732,23 @@ while true do
 	end
 
 	if tmpappcat==1 then
-	    tmpcatText = lang_lines[1]				 --@@ NEW! PS Vita
-	elseif tmpappcat==2 then
-	    tmpcatText = lang_lines[3]				 --@@ NEW! PSP
-	elseif tmpappcat==3 then
-	    tmpcatText = lang_lines[4]				 --@@ NEW! PS1
-	elseif tmpappcat==4 then
-	    tmpcatText = lang_lines[2]				 --@@ NEW! Homebrew
+	    tmpcatText = lang_lines[1]	 -- PS Vita
+	elseif tmpappcat == 2 then
+	    tmpcatText = lang_lines[3]	 -- PSP
+	elseif tmpappcat == 3 then
+	    tmpcatText = lang_lines[4]	 -- PS1
+	elseif tmpappcat == 4 then
+	    tmpcatText = lang_lines[2]	 -- Homebrew
 	else
-	    tmpcatText = lang_lines[121]			 --@@ NEW! Default
+	    tmpcatText = lang_lines[121] -- Default
 	end
 
 	if xCatLookup(showCat)[p].launch_type == 0 then
 	    menuItems = 2
 	    Graphics.fillRect(24, 470, 350 + (menuY * 40), 390 + (menuY * 40), themeCol)-- selection
-	    Font.print(fnt22, 50, 352, lang_lines[20], white)				 --@@ NEW! Download Cover
-	    Font.print(fnt22, 50, 352+40, lang_lines[120] .. tmpcatText .. ">", white)	 --@@ NEW! "Override Category: < " .. tmpcatText .. " >"
-	    Font.print(fnt22, 50, 352+80, lang_lines[122], white)			 --@@ NEW! Rename
+	    Font.print(fnt22, 50, 352, lang_lines[20], white)				 -- Download Cover
+	    Font.print(fnt22, 50, 352+40, lang_lines[120] .. tmpcatText .. ">", white)	 -- Override Category: <  .. tmpcatText ..  >
+	    Font.print(fnt22, 50, 352+80, lang_lines[122], white)			 -- Rename
 
 	    --if xCatLookup(showCat)[p].fave_heart == true then
 	    --    Graphics.drawImage(420, 50, imgFav_large_on)
@@ -2848,17 +2781,15 @@ while true do
 			if status ~= RUNNING then
 			    if hasTyped == false then
 				Keyboard.start(lang_lines[123], sanitize(xCatLookup(showCat)[p].apptitle), 512, TYPE_LATIN, MODE_TEXT)
-				--@@ NEW!      ^ "Rename. Leave blank to reset title."
+				--	       ^ "Rename. Leave blank to reset title."
 				hasTyped = true
 			    else
 				result_text = sanitize(Keyboard.getInput())
 				Keyboard.clear()
 				hasTyped = false
 				status = System.getMessageState()
-				if (string.format("%q", result_text) ~= "\"" .. result_text .. "\"")
-				or (result_text == "-") then	 --@@ NEW! If an app is named this, it prevents launch and pressing triangle on it.
-				    -- %q format makes the string LUA compatible by 1: adding quotes to the end and 2: sanitizing any LUA-special characters...
-				    -- ...so if the string with added quotes DOESN'T equal the %q format output, it's not gonna go well with cache.
+				if (string.format("%q", result_text) ~= "\"" .. result_text .. "\"")	 -- Prevents people from using LUA-reserved phrases like "\n"
+				or (result_text == "-") then						 -- Prevents an annoying glitch
 				    System.setMessage("invalid title", false, BUTTON_OK)
 				else
 				    if result_text:len() == 0 then
@@ -2966,13 +2897,7 @@ while true do
     elseif showMenu == 2 then
 
 	-- Set Setting Menu Tab Spacing.
-    --@@if not toggle1X then
-    --@@    if (Font.getTextWidth(fnt22, lang_lines[107] .. ": ")) > 260 then
-    --@@	toggle1X = (Font.getTextWidth(fnt22, lang_lines[107] .. ": ")) - 260 --Crop 'Vita' in View #5+
-    --@@    else
-    --@@	toggle1X = 0
-    --@@    end
-	if not toggle2X then	 --@@ NEW!
+	if not toggle2X then
 	    if (Font.getTextWidth(fnt22, lang_lines[99] .. ": ")) > 275 then
 		toggle2X = (Font.getTextWidth(fnt22, lang_lines[99] .. ": ")) - 275 --Hide Empty Categories
 	    else
@@ -2982,14 +2907,12 @@ while true do
 	-- SETTINGS
 	-- Footer buttons and icons. label X's are set in function ChangeLanguage()
 	Graphics.drawImage(label1AltImgX, 510, btnCancel)	 -- Used to be btnO
---@@	Font.print(fnt20, label1AltX, 508, lang_lines[11], white)--Close
 	Font.print(fnt20, label1AltImgX + 28, 508, lang_lines[11], white)--Close
 	Graphics.drawImage(label2AltImgX, 510, btnAccept)	 -- Used to be btnX
---@@	Font.print(fnt20, label2AltX, 508, lang_lines[32], white)--Select
 	Font.print(fnt20, label2AltImgX + 28, 508, lang_lines[32], white)--Select
 	Graphics.fillRect(60, 900, 24, 488, darkalpha)
-	Graphics.drawImage(84, 33, imgCog)				 --@@ NEW!
-	Font.print(fnt22, 84 + 36, 34, lang_lines[6], white)--SETTINGS	 --@@ NEW! +36 for imgCog
+	Graphics.drawImage(84, 33, imgCog)
+	Font.print(fnt22, 84 + 36, 34, lang_lines[6], white)--SETTINGS
 	if menuY < 5 then
 	    Graphics.fillRect(60, 900, 77 + (menuY * 34), 112 + (menuY * 34), themeCol)-- selection
 	elseif menuY == 11 then
@@ -3029,7 +2952,7 @@ while true do
 	elseif themeColor == 7 then
 	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[30], white)--Orange
 	elseif themeColor == 6 then
-	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[54], white)--Pink
+	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[55], white)--Pink
 	elseif themeColor == 8 then
 	    Font.print(fnt22, 84 + 260, 79 + 34, lang_lines[29], white)--Purple
 	else
@@ -3084,33 +3007,8 @@ while true do
         Font.print(fnt22, 84 + 260, 79 + 102, BGroundText, white)
 
 	Font.print(fnt22, 84, 79 + 136, lang_lines[21] .. ": ", white)--Language
---@@	Font.print(fnt22, 84, 79 + 136, lang_lines[21] .. ": ", lightgrey)--Language
-	Graphics.drawImage(84 + 260 - 40, 79 + 136 + 3, imgFlag)	 --@@ NEW!
-        Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[127], white)	 --@@ NEW! English/etc
---@@        if setLanguage == 1 then
---@@            Font.print(fnt22, 84 + 260, 79 + 136, "German", white)
---@@        elseif setLanguage == 2 then
---@@            Font.print(fnt22, 84 + 260, 79 + 136, "French", white)
---@@        elseif setLanguage == 3 then
---@@            Font.print(fnt22, 84 + 260, 79 + 136, "Italian", white)
---@@        elseif setLanguage == 4 then
---@@            Font.print(fnt22, 84 + 260, 79 + 136, "Spanish", white)
---@@        elseif setLanguage == 5 then
---@@            Font.print(fnt22, 84 + 260, 79 + 136, "Russian", white)
---@@        elseif setLanguage == 6 then
---@@            Font.print(fnt22, 84 + 260, 79 + 136, "Swedish", white)
---@@        elseif setLanguage == 7 then
---@@            Font.print(fnt22, 84 + 260, 79 + 136, "Portugese", white)
---@@        elseif setLanguage == 8 then
---@@            Font.print(fnt22, 84 + 260, 79 + 136, "Polish", white)
---@@        elseif setLanguage == 9 then
---@@            Font.print(fnt22, 84 + 260, 79 + 136, "Japanese", white)
---@@        elseif setLanguage == 10 then
---@@            Font.print(fnt22, 84 + 260, 79 + 136, "Chinese", white)
---@@        else
---@@            Font.print(fnt22, 84 + 260, 79 + 136, "English", white)
---@@        end
-
+	Graphics.drawImage(84 + 260 - 40, 79 + 136 + 3, imgFlag)
+        Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[127], white)	 --@@ NEW! Japanese/English/etc
 
 	Font.print(fnt22, 84, 79 + 170, lang_lines[16] .. ": ", white)--Music & Sounds
 	Graphics.drawImage(84 + 260 - 22, 79 + 170 + 4, imgMusic)
@@ -3135,12 +3033,11 @@ while true do
 	elseif categoryButton == 3 then
 	    Graphics.drawImage(484 + 275, 79 + 170 + 4, btnS)
 	    Font.print(fnt22, 484 + 275 + 22, 79 + 170 + 1, "/", white)
---@@	    Font.print(fnt20, 484 + 275 + 35, 79 + 170 + 4, "▼", white)
-	    if setLanguage == 11 then						 --@@ Cheap hotfix for Chinese Simplified
-		Graphics.debugPrint(484 + 275 + 35, 79 + 170 + 4, "▼", white)	 --@@ Cheap hotfix for Chinese Simplified
-	    else								 --@@ Cheap hotfix for Chinese Simplified
+	    if setLanguage == 11 then						 -- Cheap hotfix for Chinese Simplified
+		Graphics.debugPrint(484 + 275 + 35, 79 + 170 + 4, "▼", white)	 -- Cheap hotfix for Chinese Simplified
+	    else								 -- Cheap hotfix for Chinese Simplified
 		Font.print(fnt20, 484 + 275 + 35, 79 + 170 + 4, "▼", white)	 -- large down arrow. Note: large up arrow is ▲
-	    end									 --@@ Cheap hotfix for Chinese Simplified
+	    end									 -- Cheap hotfix for Chinese Simplified
 	    Graphics.drawImage(484 + 275 + 58, 79 + 170 + 4, btnS)
 	else
 	    Graphics.drawImage(484 + 275, 79 + 170 + 4, btnS)
@@ -3152,8 +3049,8 @@ while true do
         else
             Font.print(fnt22, 84 + 260, 79 + 204, lang_lines[23], white)--OFF
         end
-    --@@Graphics.drawImage(484, 79 + 204 + 2, imgCache)
-    --@@Font.print(fnt22, 484 + 34, 79 + 204, lang_lines[96] .. ": ", white)--RetroFlow
+    --  Graphics.drawImage(484, 79 + 204 + 2, imgCache)
+    --  Font.print(fnt22, 484 + 34, 79 + 204, lang_lines[96] .. ": ", white)--RetroFlow
         Font.print(fnt22, 484, 79 + 204, lang_lines[96] .. ": ", white)--RetroFlow
         if setRetroFlow == 1 then
             Font.print(fnt22, 484 + toggle2X + 275, 79 + 204, lang_lines[22], white)--ON
@@ -3270,7 +3167,7 @@ while true do
 		    end
 		    ApplyBackground(setBackground)
                 elseif menuY == 4 then
-		    if setLanguage < 19 then	 --@@ NEW! 10 new languages
+		    if setLanguage < 19 then
 			setLanguage = setLanguage + 1
 		    else
 			setLanguage = 0
@@ -3527,7 +3424,6 @@ while true do
 	-- More Information / About
 	-- Footer buttons and icons. label X's are set in ChangeLanguage()
 	Graphics.drawImage(label1AltImgX, 510, btnCancel)	 -- Used to be btnO
---@@	Font.print(fnt20, label1AltX, 508, lang_lines[11], white)--Close
 	Font.print(fnt20, label1AltImgX + 28, 508, lang_lines[11], white)--Close
 
 
