@@ -1,4 +1,4 @@
-﻿-- HexFlow Launcher Custom version 2.4.1
+﻿-- HexFlow Launcher Custom version 2.5
 -- based on VitaHEX's HexFlow Launcher v0.5 + SwitchView UI v0.1.2 + jimbob4000's Retroflow v5.0.2
 -- https://www.patreon.com/vitahex
 -- Want to make your own version? Right-click the vpk and select "Open with... Winrar" and edit the index.lua inside.
@@ -11,7 +11,7 @@ local sortTime = 0
 
 dofile("app0:addons/threads.lua")
 local working_dir = "ux0:/app"
-local appversion = "2.4.1"
+local appversion = "2.5"
 function System.currentDirectory(dir)
     if dir == nil then
         return working_dir --"ux0:/app"
@@ -345,7 +345,7 @@ function load_RetroFlow()
 		table.insert(tmp_table_out_1, v)
 		if tmp_covers_list[custom_path] then
 		    v.icon_path = coverspath .. custom_path
-		elseif showView==5 or showView==6 then
+		elseif showView==5 or showView==6 or showView==7 then		 --@@ NEW! Now accounts for CrossbarView
 		    v.icon_path = xSIconLookup(tmpap)				 -- special square placeholder icons for SwitchView.
 		else
 		    v.icon_path = xTrueIconLookup(tmpap)
@@ -428,6 +428,7 @@ function load_SwitchView()
     btnMenu5 = Graphics.loadImage("app0:/DATA/btm5.png")
     btnMenu6 = Graphics.loadImage("app0:/DATA/btm6.png")
     btnMenuSel = Graphics.loadImage("app0:/DATA/selct.png")
+    barCap = Graphics.loadImage("app0:/DATA/bar_cap.png")	 --@@ NEW! For CrossbarView
     SwitchviewAssetsAreLoaded = true
 end
 
@@ -480,6 +481,8 @@ local pink = Color.new(170, 68, 101)
 local purple = Color.new(77, 4, 160)
 local lightblue = Color.new(67, 178, 255)
 local greyalpha = Color.new(45, 45, 45, 180)
+--@@local tenalpha = Color.new(255, 255, 255, 26)	 --@@ new but unused
+local fourtyalpha = Color.new(255, 255, 255, 102)	 --@@ NEW! For CrossbarView
 local bg = Color.new(153, 217, 234)
 local themeCol = Color.new(2, 72, 158)
 
@@ -509,8 +512,8 @@ local startCovers = false
 local inPreview = false
 local apptype = 0
 local appdir = ""
-local getCovers = 1 --1 PSV, 2 Homebrews, 3 PSP, 4 PS1
-local getBGround = 1 --1 Custom, 2 Citylights, 3 Aurora, 4 "Wood 1", 5 "Wood 2", 6 Dark, 7 Marble
+local getCovers = 1	 --0 All, 1 PSV, 2 Homebrews, 3 PSP, 4 PS1
+local getBGround = 1	 --0 Off, 1 Custom, 2 Citylights, 3 Aurora, 4 "Wood 1", 5 "Wood 2", 6 Dark, 7 Marble
 local BGroundText = "-"
 local tmpappcat = 0
 local background_brackets = true
@@ -542,7 +545,7 @@ local showHomebrews = 0
 local setSwitch = 0
 local setRetroFlow = 0
 local hideEmptyCats = 0
-local categoryButton = 0
+local categoryButton = 0			 -- 0 Box, 1 D-Pad, 2 ▲/▼, 3 Box/▼Box
 local View5VitaCropTop = 1
 local lockView = 0
 local showRecentlyPlayed = 1
@@ -842,8 +845,59 @@ local imgFlag = Graphics.loadImage("app0:/translations/" .. lang .. ".png")
 
 function PrintCentered(font, x, y, text, color, size)
     text = text:gsub("\n","")
-    local width = Font.getTextWidth(font,text)
+    local width = Font.getTextWidth(font, text)
     Font.print(font, x - width / 2, y, text, color)
+end
+
+function DrawCrossbar()			 --@@ NEW! Requires SwitchView to be loaded for barcap
+    local width = Font.getTextWidth(fnt22, categoryText)
+    if width > 256 then
+	Graphics.fillRect(0, 300 + width - 256, 113, 155, darkalpha)
+	Graphics.drawScaleImage(322 + width - 256, 113, barCap, -0.875, 0.875, darkalpha)
+	Font.print(fnt22, 39, 124 - 3, categoryText, white)
+    else
+	Graphics.fillRect(0, 300, 113, 155, darkalpha)
+	Graphics.drawScaleImage(322, 113, barCap, -0.875, 0.875, darkalpha)
+    --@@PrintCentered(fnt22, 167, 124 - 3, categoryText, white, 22)
+	Font.print(fnt22, 167 - width / 2, 124 - 3, categoryText, white)
+    end
+end
+
+local pic_loaded = false
+function update_loading_screen_progress(loading_percent)
+    Graphics.termBlend() 		 -- @@End main loop blending if still running
+    Graphics.initBlend()
+    Screen.clear(black)
+
+    if pic_loaded or System.doesFileExist("app0:/sce_sys/pic0.png") then
+	if pic_loaded == false then
+	    pic0 = Graphics.loadImage("app0:/sce_sys/pic0.png")
+	end
+	Graphics.drawImage(0, 0, pic0)
+	pic_loaded = true
+    else
+	Graphics.fillRect(24, 938, 24, 522, purple)
+	Graphics.fillRect(25, 937, 25, 521, black)
+    end
+
+--@@ for debugging. Pauses the loading screen unless you're touching the touchscreen
+--@@    x1, y1 = Controls.readTouch()
+--@@    while not x1 do
+--@@        x1, y1 = Controls.readTouch()
+--@@    end
+    Graphics.fillRect(341, 619, 480, 544, black)	 --@@ invisible box 1
+    PrintCentered(fnt20, 480, 503, math.floor(loading_percent*100) .. "%... " .. sanitize(lang_lines[52]), white, 22)
+
+
+    -- Progress bar background
+    Graphics.fillRect(275, 685, 480, 506, black)	 --@@ invisible box 2
+    Graphics.fillRect(330, 630, 490, 496, purple)
+
+    -- Progress bar percent
+    Graphics.fillRect(330, 330 + (300*loading_percent), 490, 496, pink)
+
+    Graphics.termBlend()
+    Screen.flip()
 end
 
 function TableConcat(t1, t2)
@@ -882,6 +936,7 @@ function FreeMemory()
 	Graphics.freeImage(btnMenu5)
 	Graphics.freeImage(btnMenu6)
 	Graphics.freeImage(btnMenuSel)
+	Graphics.freeImage(barCap)		 --@@ NEW!
     end
 end
 
@@ -1430,6 +1485,9 @@ function LoadAppTitleTables()
 	System.closeFile(file_over)
 
 	for _, file in pairs(real_app_list) do
+	    if (#real_app_list > 5) and (#folders_table ~= 0) then		 --@@ NEW!
+		update_loading_screen_progress(#folders_table / total_apps)	 --@@ NEW!
+	    end									 --@@ NEW!
 	    newAppsMsg = newAppsMsg .. "+" .. file.name .. "\n"
 	    local custom_path, custom_path_id, app_type = nil, nil, nil
 	    info = System.extractSfo(working_dir .. "/" .. file.name .. "/sce_sys/param.sfo")
@@ -1465,6 +1523,11 @@ function LoadAppTitleTables()
 	  --table.insert(files_table, file)
 	end
     end
+
+    if pic_loaded == true then							 --@@ NEW!
+	Graphics.freeImage(pic0)						 --@@ NEW!
+    end										 --@@ NEW!
+
     table.sort(games_table, function(a, b) return (a.apptitle:lower() < b.apptitle:lower()) end)
     table.sort(homebrews_table, function(a, b) return (a.apptitle:lower() < b.apptitle:lower()) end)
     table.sort(psp_table, function(a, b) return (a.apptitle:lower() < b.apptitle:lower()) end)
@@ -1951,8 +2014,10 @@ function DownloadCategoryCovers()
 		Screen.flip()
 
 		System.setMessageProgress(i / #xCatLookup(getCovers) * 100)
---@@		System.setMessageProgMsg("Downloading " .. xTextLookup(getCovers) .. " covers...\nCover " .. xCatLookup(getCovers)[i].name .. "\nFound " .. cvrfound .. " of " .. #xCatLookup(getCovers))
-		System.setMessageProgMsg(lang_lines[51]:gsub("*", xTextLookup(getCovers)) .. "...\n" .. xCatLookup(getCovers)[i].name .. "\n" .. lang_lines[53]:gsub("*", cvrfound .. " / " .. #xCatLookup(getCovers)))	 --@@ NEW!
+		System.setMessageProgMsg(lang_lines[51]:gsub("*", xTextLookup(getCovers)) .. "...\n" .. xCatLookup(getCovers)[i].name .. "\n" .. lang_lines[53]:gsub("*", cvrfound .. " / " .. #xCatLookup(getCovers)))
+		--@@ Downloading PS Vita covers...
+		--@@        VITASHELL
+		--@@         5 / 68
 
 		Graphics.initBlend()
 		Graphics.termBlend()
@@ -2098,6 +2163,40 @@ local function DrawCover(x, y, text, icon, sel, apptype, reflections)
 		Graphics.drawImageExtended(x+66, y+66, icon, 0, vita_header_size, icon_width, icon_height-vita_header_size, 0, 132 / icon_width, 132 / (icon_height - vita_header_size))
 	    else
 		Graphics.drawScaleImage(x, y, icon, 132 / icon_width, 132 / icon_height)
+	    end
+	elseif showView==7 and inPreview==false then
+	    --@@ NEW! CrossbarView! 100px image size, 108px space.
+	    y = x * 108 + 154						 --@@ cheap code by putting x in y so I don't have to redo this whole function to support vertical scrolling
+	    x = 117
+	    table.insert(tap_zones, {x, y, 100, sel})
+	    icon_height = Graphics.getImageHeight(icon)
+	    icon_width = Graphics.getImageWidth(icon)
+	    if sel==p then
+		if setBackground == 3 then				 --@@ Aurora
+		    Graphics.drawScaleImage(0, y + 54 - 19.8, imgFloor2, 960, 0.1)
+		    Graphics.drawScaleImage(0, y + 54 + 19.8, imgFloor2, 960, -0.1)
+		end
+		Graphics.debugPrint(250, y + 43, text, white)
+		if apptype==1 and View5VitaCropTop==1 and icon_height~=128 then
+		  --vita_header_size = math.ceil(icon_height*31/320)
+		    vita_header_size = math.ceil(icon_height*0.096875)	 -- how big the blue top of the vita cover is (29/320 will work but 31/320 looks best) to dynamicly crop it.
+		    Graphics.drawImageExtended(x+50, y+50, icon, 0, vita_header_size, icon_width, icon_height - vita_header_size, 0, 100 / icon_width, 100 / (icon_height-vita_header_size))
+		else
+		    Graphics.drawScaleImage(117, y, icon, 100 / icon_width, 100 / icon_height)
+		end
+	    else
+		if targetX == base_x then
+		    Graphics.debugPrint(250, y + 43, text, lightblue)
+		else
+		    Graphics.debugPrint(250, y + 43, text, lightblue)
+		end
+		if apptype==1 and View5VitaCropTop==1 and icon_height~=128 then
+		  --vita_header_size = math.ceil(icon_height*31/320)
+		    vita_header_size = math.ceil(icon_height*0.096875)	 -- how big the blue top of the vita cover is (29/320 will work but 31/320 looks best) to dynamicly crop it.
+		    Graphics.drawImageExtended(x+50, y+50, icon, 0, vita_header_size, icon_width, icon_height - vita_header_size, 0, 100 / icon_width, 100 / (icon_height-vita_header_size), fourtyalpha)
+		else
+		    Graphics.drawScaleImage(117, y, icon, 100 / icon_width, 100 / icon_height, fourtyalpha)
+		end
 	    end
         elseif apptype==1 then
             -- PSVita Boxes
@@ -2452,7 +2551,9 @@ while true do
     -- Use this to debug instead of SCE_CTRL_SELECT.
     -- Graphics.debugPrint(10,10, " master_index:" .. master_index .. " p:" .. p .. " curTotal:" .. curTotal .. " targetX:" .. targetX .. " targetY:" .. targetY .. " BaseYHotfix:" .. BaseYHotfix, white)
 
-    Graphics.fillRect(0, 960, 496, 544, themeCol)-- footer bottom
+    if showMenu ~= 0 then		 --@@ NEW!
+	Graphics.fillRect(0, 960, 496, 544, themeCol)-- footer bottom
+    end					 --@@ NEW!
     if showView == 5 or showView == 6 then
 	Graphics.drawLine(21, 940, 496, 496, white)
     end
@@ -2460,8 +2561,17 @@ while true do
     if showMenu == 0 then
         -- MAIN VIEW
 	-- Shadow fix for covers with transparency and SwitchView Bottom Menu.
-	if (showView == 5 or showView == 6) and setReflections==1 then
-	    Graphics.drawScaleImage(0, 298, imgFloor2, 960, 1)
+--@@	if (showView == 5 or showView == 6) and setReflections==1 then
+--@@	    Graphics.drawScaleImage(0, 298, imgFloor2, 960, 1)
+--@@	end
+	if setReflections == 1 then
+	    if (showView == 5) or (showView == 6) then
+		Graphics.drawScaleImage(0, 298, imgFloor2, 960, 1)
+	    elseif showView == 7 then
+	    --@@Graphics.drawScaleImage(0, 298, imgFloor2, 960, 1.25, fourtyalpha) --@@ <----- In the 'alpha' versions of CrossbarView, this was used instead of the below 2 lines.
+		Graphics.drawScaleImage(0, 188, imgFloor2, 960, 2)
+		Graphics.drawScaleImage(0, 198, imgFloor2, 960, -1)
+	    end
 	end
 
         prevX = 0
@@ -2527,8 +2637,8 @@ while true do
                         Index = "ricon"
                     })
                 end
-		DrawCover(space*(l-curTotal-1) + targetX + n64_x_bonus, -0.6, file.name, file.ricon or imgCoverTmp, l, file.app_type, setReflections)--draw visible covers only @@ n64_fix
-
+	    --@@DrawCover(space*(l-curTotal-1) + targetX + n64_x_bonus, -0.6, file.name, file.ricon or imgCoverTmp, l, file.app_type, setReflections)--draw visible covers only @@ n64_fix
+		DrawCover(space*(l-curTotal-1) + targetX + n64_x_bonus, -0.6, file.apptitle, file.ricon or imgCoverTmp, l, file.app_type, setReflections)--draw visible covers only @@ n64_fix
             else
 		if skipRow == false and showView == 6 then
 		    skipRow = true
@@ -2543,8 +2653,27 @@ while true do
                 end
             end
         end
-        -- Header and footer are now drawn AFTER the covers so Grid View can work right.
-	Graphics.fillRect(0, 960, 496, 544, themeCol)
+
+	if showView == 7 and categoryButton ~= 1 then				 --@@ NEW!
+	    if (setLanguage == 9) or (setLanguage == 10) or (setLanguage == 11) then --@@ NEW! Also works: if fontfile ~= "app0:/DATA/font.woff" then
+		categoryText = "< " .. sanitize(xTextLookup(showCat)) .. " >"	 --@@ NEW! Also works: «/»
+	    else								 --@@ NEW!
+		categoryText = "◄ " .. sanitize(xTextLookup(showCat)) .. " ►"	 --@@ NEW! Also works: ◂/▸ or ◀/▶
+	    end									 --@@ NEW!
+	else									 --@@ NEW!
+	    categoryText = sanitize(xTextLookup(showCat))			 --@@ NEW! PS VITA/HOMEBREWS/PSP/PSX/CUSTOM/ALL..... etc
+	end									 --@@ NEW!
+
+	--@@ HEADER
+	if showView == 7 then							 --@@ NEW!
+	    Graphics.drawLine(668, 960, 27, 27, white)				 --@@ NEW!
+	    Graphics.drawLine(669, 669, 27, 65, white)				 --@@ NEW!
+	    Graphics.drawLine(668, 960, 65, 65, white)				 --@@ NEW!
+	    Graphics.fillRect(668, 960, 26, 65, darkalpha)			 --@@ NEW!
+	    DrawCrossbar()				 			 --@@ NEW!
+	else									 --@@ NEW!
+	    Graphics.fillRect(0, 960, 496, 544, themeCol)
+	end									 --@@ NEW!
 	if showView == 6 then
 	    Graphics.fillRect(0, 960, 0, 65, darkalpha)		 -- Header top
 	    Graphics.drawLine(21, 940, 496, 496, white)
@@ -2560,27 +2689,53 @@ while true do
 	if Network.isWifiEnabled() then
 	    Graphics.drawImage(800, 38, imgWifi)-- wifi icon
 	end
-	-- Footer buttons and icons. X positions set in ChangeLanguage()
+	--@@ END HEADER
+
+	--@@ FOOTER. X positions set in ChangeLanguage()
+	if showView == 7 then							 --@@ NEW!
+	    if lockView == 0 then						 --@@ NEW!
+		Graphics.fillRect(label4ImgX - 35, 960, 496, 544, themeCol)	 --@@ NEW! Mini footer bottom drawn next to btnCancel which used to be btnO
+		Graphics.drawImage(label4ImgX - 60, 496, barCap, themeCol)	 --@@ NEW!
+		Graphics.drawImage(label4ImgX, 510, btnCancel)			 --@@ NEW! Used to be btnO
+		Font.print(fnt20, label4ImgX + 28, 508, lang_lines[10], white)	 --@@ NEW! View
+	    elseif categoryButton ~= 2 then					 --@@ NEW!
+		Graphics.fillRect(label3ImgX - 35, 960, 496, 544, themeCol)	 --@@ NEW!
+		Graphics.drawImage(label3ImgX - 60, 496, barCap, themeCol)	 --@@ NEW!
+	    else								 --@@ NEW!
+		Graphics.fillRect(label2ImgX - 35, 960, 496, 544, themeCol)	 --@@ NEW! Mini footer bottom drawn next to btnT
+		Graphics.drawImage(label2ImgX - 60, 496, barCap, themeCol)	 --@@ NEW!
+	    end									 --@@ NEW!
+
+	    if categoryButton == 1 then						 --@@ NEW!
+		Graphics.drawRotateImage(label3ImgX + 10, 520, btnD, 1.57079)	 --@@ NEW!
+		Font.print(fnt20, label3ImgX + 28, 508, lang_lines[9], white)	 --@@ NEW! Category
+	    elseif categoryButton ~= 2 then					 --@@ NEW!
+		Graphics.drawImage(label3ImgX, 510, btnS)			 --@@ NEW!
+		Font.print(fnt20, label3ImgX + 28, 508, lang_lines[9], white)	 --@@ NEW! Category
+	    end									 --@@ NEW!
+	else	--@@ not view 7:						 --@@ NEW!
+	    Graphics.fillRect(0, 960, 496, 544, themeCol)
+	    if categoryButton == 1 then
+		Graphics.drawImage(label3ImgX, 510, btnD)
+		Font.print(fnt22, 32, 34, categoryText, white)
+		Font.print(fnt20, label3ImgX + 28, 508, lang_lines[9], white)--Category
+	    elseif categoryButton == 2 then
+		Graphics.drawImage(34, 37, imgArrows)
+		Font.print(fnt22, 52, 34, categoryText, white)
+	    else
+		Graphics.drawImage(label3ImgX, 510, btnS)
+		Font.print(fnt22, 32, 34, categoryText, white)
+		Font.print(fnt20, label3ImgX + 28, 508, lang_lines[9], white)--Category
+	    end
+	    if lockView == 0 then
+		Graphics.drawImage(label4ImgX, 510, btnCancel)	 -- Used to be btnO
+		Font.print(fnt20, label4ImgX + 28, 508, lang_lines[10], white)--View
+	    end
+	end									 --@@ NEW!
 	Graphics.drawImage(label1ImgX, 510, btnAccept)	 -- Used to be btnX
 	Font.print(fnt20, label1ImgX + 28, 508, lang_lines[7], white)--Launch
 	Graphics.drawImage(label2ImgX, 510, btnT)
 	Font.print(fnt20, label2ImgX + 28, 508, lang_lines[8], white)--Details
-	if categoryButton == 1 then
-	    Graphics.drawImage(label3ImgX, 510, btnD)
-	    Font.print(fnt22, 32, 34, xTextLookup(showCat), white)--PS VITA/HOMEBREWS/PSP/PSX/CUSTOM/ALL
-	    Font.print(fnt20, label3ImgX + 28, 508, lang_lines[9], white)--Category
-	elseif categoryButton == 2 then
-	    Graphics.drawImage(34, 37, imgArrows)
-	    Font.print(fnt22, 52, 34, xTextLookup(showCat), white)--PS VITA/HOMEBREWS/PSP/PSX/CUSTOM/ALL
-	else
-	    Graphics.drawImage(label3ImgX, 510, btnS)
-	    Font.print(fnt22, 32, 34, xTextLookup(showCat), white)--PS VITA/HOMEBREWS/PSP/PSX/CUSTOM/ALL
-	    Font.print(fnt20, label3ImgX + 28, 508, lang_lines[9], white)--Category
-	end
-	if lockView == 0 then
-	    Graphics.drawImage(label4ImgX, 510, btnCancel)	 -- Used to be btnO
-	    Font.print(fnt20, label4ImgX + 28, 508, lang_lines[10], white)--View
-	end
 
 	if showView == 5 then
 	    Graphics.drawImage(27, 108, imgCart)
@@ -2596,6 +2751,8 @@ while true do
 		PrintCentered(fnt23_5, menuSel*82-82+240+39, 452, lang_lines[menuSel+78], lightblue, 22) -- News/Store/Album/Controls/System Settings/Exit
 		-- This is a really cheap way to put lang lines. I'll fix it later maybe (probably not honestly)
 	    end
+	elseif showView == 7 then
+	    --@@ For CrossbarView, titles are drawn in a special way. In DrawCover()
         elseif (showView ~= 2) and (showView ~= 6) then
             Graphics.fillRect(0, 960, 424, 496, black)-- black footer bottom
             PrintCentered(fnt25, 480, 430, app_short_title, white, 25)-- Draw title
@@ -2603,9 +2760,10 @@ while true do
             Font.print(fnt22, 24, 508, app_short_title, white)	 -- Grid View draws apptitle at the bottom, like View 2.
         end
 
-        if showView ~= 2 and showView ~= 6 and not bottomMenu then	 -- Disable curtotal counter in Grid View.
+        if (showView ~= 2) and (showView ~= 6) and (showView ~= 7) and not bottomMenu then	 -- Disable curtotal counter in Grid View/CrossbarView
             PrintCentered(fnt20, 480, 462, p .. " of " .. #xCatLookup(showCat), white, 20)-- Draw total items
         end
+	--@@ END FOOTER
         
         
 	-- Special Y border calculations for Grid View
@@ -2812,28 +2970,28 @@ while true do
 		    if menuY > 0 then
 			menuY = menuY - 1
 		    else
-			menuY=menuItems
+			menuY = menuItems
 		    end
 		elseif (Controls.check(pad, SCE_CTRL_DOWN)) and not (Controls.check(oldpad, SCE_CTRL_DOWN)) then
 		    if menuY < menuItems then
 			menuY = menuY + 1
 		    else
-			menuY=0
+			menuY = 0
 		    end
 		elseif (Controls.check(pad, SCE_CTRL_LEFT)) and not (Controls.check(oldpad, SCE_CTRL_LEFT)) then
-		    if menuY==1 then
+		    if menuY == 1 then
 			if tmpappcat > 0 then
 			    tmpappcat = tmpappcat - 1
 			else
-			    tmpappcat=4
+			    tmpappcat = 4
 			end
 		    end
 		elseif (Controls.check(pad, SCE_CTRL_RIGHT)) and not (Controls.check(oldpad, SCE_CTRL_RIGHT)) then
-		    if menuY==1 then
+		    if menuY == 1 then
 			if tmpappcat < 4 then
 			    tmpappcat = tmpappcat + 1
 			else
-			    tmpappcat=0
+			    tmpappcat = 0
 			end
 		    end
 		end
@@ -2841,8 +2999,8 @@ while true do
 	else
 	    menuItems = 1
 	    Graphics.fillRect(24, 470, 350 + (menuY * 40), 390 + (menuY * 40), themeCol)-- selection
-	    Font.print(fnt22, 50, 355, "Download Cover", white)
-	    Font.print(fnt22, 50, 355+40, "Download Snap", white)
+	    Font.print(fnt22, 50, 355, lang_lines[20], white)	  --@@ NEW! Download Cover
+	    Font.print(fnt22, 50, 355+40, lang_lines[126], white) --@@ NEW! Download Background @@ Used to be 'Download Snap'
 	    --if xCatLookup(showCat)[p].fave_heart == true then
 	    --    Graphics.drawImage(420, 50, imgFav_large_on)
 	    --else
@@ -2867,28 +3025,28 @@ while true do
 		    if menuY > 0 then
 			menuY = menuY - 1
 		    else
-			menuY=menuItems
+			menuY = menuItems
 		    end
 		elseif (Controls.check(pad, SCE_CTRL_DOWN)) and not (Controls.check(oldpad, SCE_CTRL_DOWN)) then
 		    if menuY < menuItems then
 			menuY = menuY + 1
 		    else
-			menuY=0
+			menuY = 0
 		    end
 		elseif (Controls.check(pad, SCE_CTRL_LEFT)) and not (Controls.check(oldpad, SCE_CTRL_LEFT)) then
-		    if menuY==1 then
+		    if menuY == 1 then
 			if tmpappcat > 0 then
 			    tmpappcat = tmpappcat - 1
 			else
-			    tmpappcat=4
+			    tmpappcat = 4
 			end
 		    end
 		elseif (Controls.check(pad, SCE_CTRL_RIGHT)) and not (Controls.check(oldpad, SCE_CTRL_RIGHT)) then
-		    if menuY==1 then
+		    if menuY == 1 then
 			if tmpappcat < 4 then
 			    tmpappcat = tmpappcat + 1
 			else
-			    tmpappcat=0
+			    tmpappcat = 0
 			end
 		    end
 		end
@@ -3008,7 +3166,7 @@ while true do
 
 	Font.print(fnt22, 84, 79 + 136, lang_lines[21] .. ": ", white)--Language
 	Graphics.drawImage(84 + 260 - 40, 79 + 136 + 3, imgFlag)
-        Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[127], white)	 --@@ NEW! Japanese/English/etc
+        Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[127], white)--English/Japanese/etc
 
 	Font.print(fnt22, 84, 79 + 170, lang_lines[16] .. ": ", white)--Music & Sounds
 	Graphics.drawImage(84 + 260 - 22, 79 + 170 + 4, imgMusic)
@@ -3471,7 +3629,9 @@ while true do
         --Navigation Left Analog
 	tmp_move = 0
 	if delayButton < 0.5 then
-	    if mx < 64 then
+	    if showView == 7 then			 --@@ NEW!
+		--@@ Do nothing. No X movement for CrossbarView
+	    elseif mx < 64 then
 		delayButton = 1
 		tmp_move = 0 - 1
 	    elseif mx > 180 then
@@ -3481,6 +3641,9 @@ while true do
 	    if my > 180 and showView == 6 then
 		delayButton = 1
 		tmp_move = tmp_move + 6
+	    elseif my > 180 and showView == 7 then	 --@@ NEW!
+		delayButton = 1				 --@@ NEW!
+		tmp_move = tmp_move + 1			 --@@ NEW!
 	    elseif my > 250 and showView == 5 and bottomMenu == false then
 		delayButton = 1
 		bottomMenu = true
@@ -3488,6 +3651,9 @@ while true do
 		if showView == 6 then
 		    delayButton = 1
 		    tmp_move = tmp_move - 6
+		elseif showView == 7 then		 --@@ NEW!
+		    delayButton = 1			 --@@ NEW!
+		    tmp_move = tmp_move - 1		 --@@ NEW!
 		elseif bottomMenu == true then
 		    delayButton = 1
 		    bottomMenu = false
@@ -3631,19 +3797,33 @@ while true do
 --	    else			 -- n64_fix
 --		n64_fix = true		 -- n64_fix
 --	    end				 -- n64_fix
---	    System.setMessage(tostring(DownloadCover(xCatLookup(showCat)[p])), false, BUTTON_OK)
-	elseif (categoryButton == 3 and Controls.check(pad, SCE_CTRL_DOWN) and Controls.check(pad, SCE_CTRL_SQUARE) and not Controls.check(oldpad, SCE_CTRL_SQUARE))
-	or ((categoryButton == 1 or categoryButton == 2) and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP)) then
+--@@	elseif (categoryButton == 3 and Controls.check(pad, SCE_CTRL_DOWN) and Controls.check(pad, SCE_CTRL_SQUARE) and not Controls.check(oldpad, SCE_CTRL_SQUARE))
+--@@	or ((categoryButton == 1 or categoryButton == 2) and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP)) then
+--##	elseif (categoryButton == 3 and Controls.check(pad, SCE_CTRL_DOWN) and Controls.check(pad, SCE_CTRL_SQUARE) and not Controls.check(oldpad, SCE_CTRL_SQUARE))
+--##	or ((categoryButton == 1 or categoryButton == 2) and showView ~= 7 and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP))
+--##	or ((categoryButton == 1 or categoryButton == 2) and showView == 7 and Controls.check(pad, SCE_CTRL_LEFT) and not Controls.check(oldpad, SCE_CTRL_LEFT)) then
+	elseif (categoryButton == 3 and Controls.check(pad, SCE_CTRL_DOWN) and Controls.check(pad, SCE_CTRL_SQUARE) and not Controls.check(oldpad, SCE_CTRL_SQUARE))	 --@@ NEW!
+	or ((categoryButton == 1 or categoryButton == 2) and showView ~= 7 and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP))		 --@@ NEW!
+	or (showView == 7 and Controls.check(pad, SCE_CTRL_LEFT) and not Controls.check(oldpad, SCE_CTRL_LEFT)) then							 --@@ NEW!
 	    showCat = Category_Minus(showCat-1)
-	elseif ((categoryButton ~= 1 and categoryButton ~= 2) and Controls.check(pad, SCE_CTRL_SQUARE) and not Controls.check(oldpad, SCE_CTRL_SQUARE))
-	or ((categoryButton == 1 or categoryButton == 2) and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN)) then
+--@@	elseif ((categoryButton ~= 1 and categoryButton ~= 2) and Controls.check(pad, SCE_CTRL_SQUARE) and not Controls.check(oldpad, SCE_CTRL_SQUARE))
+--@@	or ((categoryButton == 1 or categoryButton == 2) and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN)) then
+--##	elseif ((categoryButton ~= 1 and categoryButton ~= 2) and Controls.check(pad, SCE_CTRL_SQUARE) and not Controls.check(oldpad, SCE_CTRL_SQUARE))
+--##	or ((categoryButton == 1 or categoryButton == 2) and showView ~= 7 and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN))
+--##	or ((categoryButton == 1 or categoryButton == 2) and showView == 7 and Controls.check(pad, SCE_CTRL_RIGHT) and not Controls.check(oldpad, SCE_CTRL_RIGHT)) then
+	elseif ((categoryButton ~= 1 and categoryButton ~= 2) and Controls.check(pad, SCE_CTRL_SQUARE) and not Controls.check(oldpad, SCE_CTRL_SQUARE))			 --@@ NEW!
+	or ((categoryButton == 1 or categoryButton == 2) and showView ~= 7 and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN))	 --@@ NEW!
+	or (showView == 7 and Controls.check(pad, SCE_CTRL_RIGHT) and not Controls.check(oldpad, SCE_CTRL_RIGHT)) then							 --@@ NEW!
 	    showCat = Category_Plus(showCat+1)
         elseif (Controls.check(pad, CTRL_CANCEL) and not Controls.check(oldpad, CTRL_CANCEL))	 -- Used to be SCE_CTRL_CIRCLE
 	and (lockView == 0) then
             -- VIEW
 	    if showView > 3 and setSwitch == 0 then
 		showView = 0
-	    elseif showView < 6 then
+	    elseif showView == 6 then	 --@@ NEW!
+		master_index = p	 --@@ NEW!
+		showView = 7		 --@@ NEW!
+	    elseif showView < 7 then	 --@@ Used to be 6
                 showView = showView + 1
 		if showView == 5 then
 		    if (curTotal > 4) and (p > curTotal - 3) then
@@ -3685,9 +3865,13 @@ while true do
             menuY = 0
             startCovers = false
 	    write_config()	 --Save settings
-        elseif (Controls.check(pad, SCE_CTRL_LEFT)) and not (Controls.check(oldpad, SCE_CTRL_LEFT)) then
+--@@	elseif (Controls.check(pad, SCE_CTRL_LEFT)) and not (Controls.check(oldpad, SCE_CTRL_LEFT)) then
+	elseif (showView ~= 7 and Controls.check(pad, SCE_CTRL_LEFT)) and not (Controls.check(oldpad, SCE_CTRL_LEFT))	 --@@ NEW!
+	or (showView == 7 and Controls.check(pad, SCE_CTRL_UP)) and not (Controls.check(oldpad, SCE_CTRL_UP)) then	 --@@ NEW!
 	    p_minus(1)
-        elseif (Controls.check(pad, SCE_CTRL_RIGHT)) and not (Controls.check(oldpad, SCE_CTRL_RIGHT)) then
+--@@	elseif (Controls.check(pad, SCE_CTRL_RIGHT)) and not (Controls.check(oldpad, SCE_CTRL_RIGHT)) then
+        elseif (showView ~= 7 and Controls.check(pad, SCE_CTRL_RIGHT)) and not (Controls.check(oldpad, SCE_CTRL_RIGHT))	 --@@ NEW!
+	or (showView == 7 and Controls.check(pad, SCE_CTRL_DOWN)) and not (Controls.check(oldpad, SCE_CTRL_DOWN)) then	 --@@ NEW!
 	    p_plus(1)
 
         elseif (Controls.check(pad, SCE_CTRL_LTRIGGER)) and not (Controls.check(oldpad, SCE_CTRL_LTRIGGER)) then
@@ -3732,6 +3916,8 @@ while true do
 		end
 	    elseif showView == 6 then
 		p_minus(6)
+	    elseif showView == 7 then	 --@@ NEW!
+		p_minus(1)		 --@@ NEW!
 	    end
 	elseif (Controls.check(pad,SCE_CTRL_DOWN)) and not (Controls.check(oldpad,SCE_CTRL_DOWN)) then
 	    if showView == 5 and bottomMenu == false then
@@ -3741,6 +3927,8 @@ while true do
 		end
 	    elseif showView == 6 then
 		p_plus(6)
+	    elseif showView == 7 then	 --@@ NEW!
+		p_plus(1)		 --@@ NEW!
 	    end
 	end
         
@@ -3787,11 +3975,15 @@ while true do
 		else
 		    targetY = targetY - ((y1 - ystart) / 1265)
 		end
+	    elseif showView == 7 then				 --@@ NEW!
+	        targetX = targetX + ((y1 - ystart) / 1000)	 --@@ NEW!
 	    else
 		-- all other views - pan camera 1/700 p per pixel moved.
 	        targetX = targetX + ((x1 - xstart) / 700)
 	    end
-	    if x1 > xstart + 60 then
+	    if showView == 7 then				 --@@ NEW!
+		--@@ NEW! Do nothing lol
+	    elseif x1 > xstart + 60 then
 		if master_index > 1 then
 		    master_index = master_index - 1
 		end
@@ -3830,6 +4022,26 @@ while true do
 		if not (math.floor((master_index - 1) / 6) > math.floor((curTotal - 1) / 6) - 2) then	 -- prevents camera from going out of bounds.
 		    master_index = master_index + 6
 		end
+                if p <= curTotal then
+                    GetNameSelected()
+                end
+		touchdown = 0
+	    elseif (showView == 7) and (y1 > ystart + 60) then	 --@@ NEW! Copy/pasted lazily from gridview. Needs a cleanup
+		if master_index > 1 then
+		    master_index = master_index - 1
+		end
+                xstart = x1					 --refresh tracking start point
+                ystart = y1
+                p = p - 1
+                if p > 0 then
+                    GetNameSelected()
+                end
+		touchdown = 0
+	    elseif (showView == 7) and (y1 < ystart - 60) then	 --@@ NEW! Copy/pasted lazily from gridview. Needs a cleanup
+                xstart = x1					 --refresh tracking start point
+                ystart = y1
+                p = p + 1
+		master_index = p
                 if p <= curTotal then
                     GetNameSelected()
                 end
