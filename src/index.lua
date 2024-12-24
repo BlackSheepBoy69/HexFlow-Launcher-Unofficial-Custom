@@ -1,4 +1,4 @@
-﻿-- HexFlow Launcher Custom version 2.6
+﻿-- HexFlow Launcher Custom version 2.6.1
 -- based on VitaHEX's HexFlow Launcher v0.5 + SwitchView UI v0.1.2 + jimbob4000's Retroflow v5.0.2
 -- https://www.patreon.com/vitahex
 -- Want to make your own version? Right-click the vpk and select "Open with... Winrar" and edit the index.lua inside.
@@ -8,11 +8,11 @@ local oneLoopTime = 0
 local functionTime = 0
 local applistReadTime = 0
 local sortTime = 0
-local SCUMMVMTime = 0			 --@@ NEW!
+local SCUMMVMTime = 0
 
 dofile("app0:addons/threads.lua")
 local working_dir = "ux0:/app"
-local appversion = "2.6"
+local appversion = "2.6.1"
 function System.currentDirectory(dir)
     if dir == nil then
         return working_dir --"ux0:/app"
@@ -200,7 +200,7 @@ function load_RetroFlow()
 --	System.exit()
 --  end
 
-    function launch_scummvm(romfile, game_id)	 --@@ NEW!
+    function launch_scummvm(romfile, game_id)
 	System.executeUri("psgm:play?titleid=VSCU00001" .. "&path=" .. romfile .. "&game_id=" .. game_id)
 	System.exit()
     end
@@ -227,7 +227,7 @@ function load_RetroFlow()
 	elseif rdir == 22 then return	 "ux0:data/RetroFlow/ROMS/Commodore - 64/"
 	elseif rdir == 23 then return	 "ux0:data/RetroFlow/ROMS/Bandai - WonderSwan Color/"
 	elseif rdir == 24 then return	 "ux0:data/RetroFlow/ROMS/Bandai - WonderSwan/"
-	elseif rdir == 25 then return	 "ux0:/data/RetroFlow/ROMS/ScummVM/"	 --@@ NEW!
+	elseif rdir == 25 then return	 "ux0:/data/RetroFlow/ROMS/ScummVM/"
 	elseif rdir == 26 then return	 "ux0:p8carts/"
 	elseif rdir == 27 then return	 "ux0:data/RetroFlow/ROMS/Microsoft - MSX2/"
 	elseif rdir == 28 then return	 "ux0:data/RetroFlow/ROMS/Microsoft - MSX/"
@@ -269,7 +269,7 @@ function load_RetroFlow()
 	elseif square_type == 22 then	 return "app0:/DATA/icon_c64.png"
 	elseif square_type == 23 then	 return "app0:/DATA/icon_wswan_col.png"
 	elseif square_type == 24 then	 return "app0:/DATA/icon_wswan.png"
-	elseif square_type == 25 then	 return "app0:/DATA/icon_scummvm.png"	 --@@ NEW!
+	elseif square_type == 25 then	 return "app0:/DATA/icon_scummvm.png"
 	elseif square_type == 26 then	 return "app0:/DATA/icon_pico8.png"
 	elseif square_type == 27 then	 return "app0:/DATA/icon_msx2.png"
 	elseif square_type == 28 then	 return "app0:/DATA/icon_msx1.png"
@@ -1267,7 +1267,7 @@ function LoadAppTitleTables()
 	    elseif CatNum == 22 then	 return c64_table
 	    elseif CatNum == 23 then	 return wswan_col_table
 	    elseif CatNum == 24 then	 return wswan_table
-	    elseif CatNum == 25 then	 return scummvm_table	 --@@ NEW!
+	    elseif CatNum == 25 then	 return scummvm_table
 	    elseif CatNum == 26 then	 return pico8_table
 	    elseif CatNum == 27 then	 return msx2_table
 	    elseif CatNum == 28 then	 return msx1_table
@@ -1315,7 +1315,7 @@ function LoadAppTitleTables()
 	    elseif CatTextNum == 22 then  return lang_lines[64] --Commodore 64
 	    elseif CatTextNum == 23 then  return lang_lines[86] --WonderSwan Color
 	    elseif CatTextNum == 24 then  return lang_lines[87] --WonderSwan
-	    elseif CatTextNum == 25 then  return lang_lines[128] --SCUMMVM @@ NEW!
+	    elseif CatTextNum == 25 then  return lang_lines[128] --SCUMMVM
 	    elseif CatTextNum == 26 then  return lang_lines[88] --PICO-8
 	    elseif CatTextNum == 27 then  return lang_lines[110] --MSX2
 	    elseif CatTextNum == 28 then  return lang_lines[111] --MSX
@@ -1361,7 +1361,7 @@ function LoadAppTitleTables()
 	    elseif getCovers == 22 then	 return "ux0:/data/RetroFlow/COVERS/Commodore - 64/"
 	    elseif getCovers == 23 then	 return "ux0:/data/RetroFlow/COVERS/Bandai - WonderSwan Color/"
 	    elseif getCovers == 24 then	 return "ux0:/data/RetroFlow/COVERS/Bandai - WonderSwan/"
-	    elseif getCovers == 25 then	 return "ux0:/data/RetroFlow/COVERS/ScummVM/"	 --@@ NEW!
+	    elseif getCovers == 25 then	 return "ux0:/data/RetroFlow/COVERS/ScummVM/"
 	    elseif getCovers == 26 then	 return "ux0:/data/RetroFlow/COVERS/Lexaloffle Games - Pico-8/"
 	    elseif getCovers == 27 then	 return "ux0:/data/RetroFlow/COVERS/Microsoft - MSX2/"
 	    elseif getCovers == 28 then	 return "ux0:/data/RetroFlow/COVERS/Microsoft - MSX/"
@@ -1717,10 +1717,9 @@ function GetInfoSelected()
 	    end
 	else
 	    if xCatLookup(showCat)[p].directory then
-		app_titleid = xCatLookup(showCat)[p].name			 --@@ NEW!
-		DISC_ID = xCatLookup(showCat)[p].gameid				 --@@ NEW! For ScummVM (Example: "Freddi2"). About here is also where you'd put the PSP ID scanner
-		--@@appdir=working_dir .. "/" .. xCatLookup(showCat)[p].name	 --@@ wrong base directory
-		appdir = xRomDirLookup(apptype) .. "/" .. app_titleid		 --@@ NEW! example: "ux0:pspemu/PSP/GAME/SLUS00453"
+		app_titleid = xCatLookup(showCat)[p].name
+		DISC_ID = xCatLookup(showCat)[p].gameid				 -- For ScummVM (Example: "Freddi2"). About here is also where you'd put the PSP ID scanner
+		appdir = xRomDirLookup(apptype) .. "/" .. app_titleid		 -- example: "ux0:pspemu/PSP/GAME/SLUS00453"
 		app_size = getAppSize(appdir)
 	    else
 		app_size = xCatLookup(showCat)[p].size
@@ -1878,7 +1877,7 @@ function DownloadCover(entry)
      or (apptype==22 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/C64/Covers/")		 -- C64
      or (apptype==23 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/WSWAN_COL/Covers/")	 -- WSCAN_COL
      or (apptype==24 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/WSWAN/Covers/")		 -- WSWAN
-     or (apptype==25 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/SCUMMVM/Covers/")	 --@@ NEW! SCUMMVM
+     or (apptype==25 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/SCUMMVM/Covers/")	 -- SCUMMVM
      or (apptype==26 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/PICO-8/Covers/")	 -- PICO-8 @@ invalid
      or (apptype==27 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/MSX2/Covers/")		 -- MSX2
      or (apptype==28 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/MSX/Covers/")		 -- MSX1
@@ -1899,7 +1898,7 @@ function DownloadCover(entry)
      ..
      (
         (launch_mode==0 and	 (DISC_ID or entry.name))		 -- For real apps. Relatively simple. Example: "VITASHELL"
-     or (launch_mode==25 and	 (entry.gameid or entry.name))		 --@@ NEW! For ScummVM. Example: "Freddi2"
+     or (launch_mode==25 and	 (entry.gameid or entry.name))		 -- For ScummVM. Example: "Freddi2"
      or (entry.name:match("(.+)%..+$")~=nil and entry.name:match("%((.+)%)")==nil and entry.name:match("(.+)%..+$") .. " (USA)")	 -- Add " (USA)" to RetroFlows with no region specified. Ex: "Donkey Kong.n64" -------> "Donkey Kong (USA)"
      or (entry.name:match("(.+)%..+$") or entry.name)			 -- For RetroFlow entries. If item has a period at the end, this removes it... otherwise it'll use the whole file name. Ex: "Donkey Kong (USA).n64" --> "Donkey Kong (USA)"
      ):gsub("%%", '%%25'):gsub("%s+", '%%20') .. ".png"			 -- Converts spacebars to "%20" and percentage signs to "%25" since you can't those in a website address, then adds ".png" Ex: "Donkey Kong (USA)" ---> "Donkey%20Kong%20(USA).png"
@@ -1912,9 +1911,9 @@ function DownloadCover(entry)
     output_folder = CoverDirectoryLookup(apptype)			 -- Ex:  "ux0:/data/HexFlow/COVERS/PSVITA/"
     System.createDirectory(output_folder)				 -- Prevents Nintendo DS cover download crash in experimental builds.
 
-    if apptype == 25 then						 --@@ NEW! ScummVM
-	custom_path = entry.gameid .. ".png"				 --@@ NEW!
-    end									 --@@ NEW!
+    if apptype == 25 then						 -- ScummVM
+	custom_path = entry.gameid .. ".png"
+    end
     Network.downloadFile(downloadable_file, "ux0:/data/HexFlow/" .. custom_path)
 
     if System.doesFileExist("ux0:/data/HexFlow/" .. custom_path) then
@@ -1973,7 +1972,7 @@ function DownloadSnap(entry)
      or (apptype==22 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Commodore_-_64/df90042ef9823d1b0b9d3ec303051f555dca2246/Named_Snaps/")					 -- C64
      or (apptype==23 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Bandai_-_WonderSwan_Color/5b57a78fafa4acb8590444c15c116998fcea9dce/Named_Snaps/")			 -- WSCAN_COL
      or (apptype==24 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Bandai_-_WonderSwan/3913706e173ec5f8c0cdeebd225b16f4dc3dd6c6/Named_Snaps/")				 -- WSWAN
-     or (apptype==25 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/SCUMMVM/Named_Snaps/")								 --@@ NEW! SCUMMVM
+     or (apptype==25 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/SCUMMVM/Named_Snaps/")								 -- SCUMMVM
      or (apptype==26 and	 "https://raw.githubusercontent.com/jimbob4000/hexflow-covers/main/Covers/Retro/PICO8/Named_Snaps/")								 -- PICO-8 @@ invalid
      or (apptype==27 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Microsoft_-_MSX2/12d7e10728cc4c3314b8b14b5a9b1892a886d2ab/Named_Snaps/")				 -- MSX2
      or (apptype==28 and	 "https://raw.githubusercontent.com/libretro-thumbnails/Microsoft_-_MSX/ed54675a51597fd5bf66a45318a273f330b7662f/Named_Snaps/")					 -- MSX1
@@ -1994,7 +1993,7 @@ function DownloadSnap(entry)
      ..
      (
         (launch_mode==0 and	 (DISC_ID or entry.name))		 -- For real apps. Relatively simple. Example: "VITASHELL"
-     or (launch_mode==25 and	 (entry.gameid or entry.name))		 --@@ NEW! For ScummVM. Example: "Freddi2"
+     or (launch_mode==25 and	 (entry.gameid or entry.name))		 -- For ScummVM. Example: "Freddi2"
      or (entry.name:match("(.+)%..+$")~=nil and entry.name:match("%((.+)%)")==nil and entry.name:match("(.+)%..+$") .. " (USA)")	 -- Add " (USA)" to RetroFlows with no region specified. Ex: "Donkey Kong.n64" -------> "Donkey Kong (USA)"
      or (entry.name:match("(.+)%..+$") or entry.name)			 -- For RetroFlow entries. If item has a period at the end, this removes it... otherwise it'll use the whole file name. Ex: "Donkey Kong (USA).n64" --> "Donkey Kong (USA)"
      ):gsub("%%", '%%25'):gsub("%s+", '%%20') .. ".png"			 -- Converts spacebars to "%20" and percentage signs to "%25" since you can't those in a website address, then adds ".png" Ex: "Donkey Kong (USA)" ---> "Donkey%20Kong%20(USA).png"
@@ -2008,10 +2007,10 @@ function DownloadSnap(entry)
 	output_folder = "ux0:data/RetroFlow/BACKGROUNDS/Sony - PlayStation Portable/"
     elseif apptype == 3 then
 	output_folder = "ux0:data/RetroFlow/BACKGROUNDS/Sony - PlayStation/"
-    elseif apptype == 25 then						 --@@ NEW!
-	output_folder = "ux0:/data/RetroFlow/BACKGROUNDS/ScummVM/"	 --@@ NEW! Not important
-	custom_path = entry.gameid .. ".png"				 --@@ NEW! Important
-    elseif apptype == 26 then						 --@@ Why was this set to 26 LAST update?!??
+    elseif apptype == 25 then
+	output_folder = "ux0:/data/RetroFlow/BACKGROUNDS/ScummVM/"	 -- Not important
+	custom_path = entry.gameid .. ".png"				 -- Important
+    elseif apptype == 26 then
 	output_folder = "ux0:data/RetroFlow/BACKGROUNDS/Lexaloffle Games - Pico-8/"
     else
 	output_folder = xRomDirLookup(apptype):gsub("/ROMS/", "/BACKGROUNDS/")
@@ -3636,7 +3635,7 @@ while true do
 
 	Font.print(fnt20, 54, 42, "HexFlow Custom - version " .. appversion .. " by BlackSheepBoy69\nRevamp mod for VitaHEX's HexFlow Launcher 0.5\nSupport the original creator on patreon.com/vitahex", white)-- Draw info
 	--@@Font.print(fnt15, 690, 42, "Sort time: ".. sortTime .. " ms.\nRead time: ".. applistReadTime .. " ms.\nFunction Load time: ".. functionTime .. " ms.\nOne Loop time: ".. oneLoopTime .. " ms.", white)
-	Font.print(fnt15, 690, 42, "Sort time: ".. sortTime .. " ms.\nRead time: ".. applistReadTime .. " ms.\nFunction Load time: ".. functionTime .. " ms.\nOne Loop time: ".. oneLoopTime .. " ms.", white)
+	Font.print(fnt15, 690, 34, "Sort time: ".. sortTime .. " ms.\nRead time: ".. applistReadTime .. " ms.\nFunction Load time: ".. functionTime .. " ms.\nOne Loop time: ".. oneLoopTime .. " ms.\nSCUMMVM time: ".. SCUMMVMTime .. " ms.", white)
 	Graphics.drawLine(30, 930, 124, 124, white)
 	Graphics.drawLine(30, 930, 384, 384, white)
 	Font.print(fnt20, 54, 132, "Custom Backgrounds & Music\nIn 'ux0:/data/HexFlow/', place your image - 'background.png' or 'background.jpg'\n(1280x720 max) and song - 'music.ogg'. Unlocks setting 'Music & Sounds: Loop/Play 1x'"
@@ -3781,7 +3780,7 @@ while true do
 			    launch_retroarch(romfile, "app0:/mednafen_wswan_libretro.self")
 			elseif launch_mode == 24 then	 --@@ WSWAN
 			    launch_retroarch(romfile, "app0:/mednafen_wswan_libretro.self")
-		      --elseif launch_mode == 25 then	 --@@ NEW! SCUMMVM
+			elseif launch_mode == 25 then	 --@@ SCUMMVM
 			    launch_scummvm(romfile, file.gameid)
 			elseif launch_mode == 26 then	 --@@ PICO8
 			    launch_Fake08(romfile)
