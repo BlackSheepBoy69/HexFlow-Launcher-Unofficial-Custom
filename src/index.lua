@@ -1,5 +1,5 @@
-﻿-- HexFlow Launcher Custom version 2.6.1
--- based on VitaHEX's HexFlow Launcher v0.5 + SwitchView UI v0.1.2 + jimbob4000's Retroflow v5.0.2
+﻿-- HexFlow Launcher Custom version 2.7
+-- based on VitaHEX's HexFlow Launcher v0.5 + SwitchView UI v0.1.2 + jimbob4000's Retroflow v7.1.0
 -- https://www.patreon.com/vitahex
 -- Want to make your own version? Right-click the vpk and select "Open with... Winrar" and edit the index.lua inside.
 
@@ -12,7 +12,7 @@ local SCUMMVMTime = 0
 
 dofile("app0:addons/threads.lua")
 local working_dir = "ux0:/app"
-local appversion = "2.6.1"
+local appversion = "2.7"
 function System.currentDirectory(dir)
     if dir == nil then
         return working_dir --"ux0:/app"
@@ -719,6 +719,10 @@ function ApplyBackground()
 	imgCustomBack = Graphics.loadImage("app0:/DATA/back_" .. setBackground .. ".png")	 -- default BG's "back_10.png" through "back_12.png"
     elseif (setBackground > 1.5) and (setBackground < 10) and (System.doesFileExist("app0:/DATA/back_0" .. setBackground .. ".png")) then
 	imgCustomBack = Graphics.loadImage("app0:/DATA/back_0" .. setBackground .. ".png")	 -- default BG's "back_02.png" through "back_08.png"
+--@@elseif cur_quick_dir["background.gif"] then
+--@@	imgCustomBack = Graphics.loadAnimatedImage("ux0:/data/HexFlow/Background.gif")
+--@@	imgCustomBackFrames = Graphics.getImageFramesNum(imgCustomBack)
+--@@	Graphics.setImageFrame(imgCustomBack, 8)
     elseif cur_quick_dir["background.png"] then
 	imgCustomBack = Graphics.loadImage("ux0:/data/HexFlow/Background.png")			 -- custom png
     elseif cur_quick_dir["background.jpg"] then
@@ -839,12 +843,14 @@ function ChangeLanguage()
     end
 
     if fontfile_old ~= fontfile then		 -- Not necessary if language is made unchangeable
+--@@	fnt14 = Font.load(fontfile)		--@@ How RetroFlow handles AM/PM
 	fnt15 = Font.load(fontfile)
 	fnt20 = Font.load(fontfile)
 	fnt22 = Font.load(fontfile)
 	fnt23_5 = Font.load(fontfile)		 -- For SwitchView
 	fnt25 = Font.load(fontfile)
 
+--@@	Font.setPixelSizes(fnt14, 14)		--@@ How RetroFlow handles AM/PM
 	Font.setPixelSizes(fnt15, 15)
 	Font.setPixelSizes(fnt20, 20)
 	Font.setPixelSizes(fnt22, 22)
@@ -1101,7 +1107,7 @@ function CoverDirectoryLookup(getCovers)  -- For categoric cover downloads
 end
 
 -- Resets an entry's app_type and respective icon_path based on overrides.dat
-function Respec_Entry(file, pspemu_translate_tmp)
+function Respec_Entry(file) --@@, pspemu_translate_tmp)
     custom_path, custom_path_id, custom_path_psx = nil, nil, nil
     if file.directory and ovrrd_str then	 -- the directory check is only here so the app functions exactly like HEXflow launcher v0.5, it's probably not necessary at all.
 	--0 default, 1 vita, 2 psp, 3 psx, 4 homebrew
@@ -1553,7 +1559,7 @@ function LoadAppTitleTables()
 		file.app_type=0
 	    end
 	    -- Respec applies overrides, adds item to table, and sets icon_path. Also used for triangle menu overrides.
-	    file.app_type, file.icon_path = Respec_Entry(file, pspemu_translate_tmp)
+	    file.app_type, file.icon_path = Respec_Entry(file) --@@, pspemu_translate_tmp)
 
 	    --file.icon = imgCoverTmp		--add blank icon to all. Not necessary anymore
         
@@ -1790,10 +1796,16 @@ function check_for_out_of_bounds()
         startCovers = false
         GetNameSelected()
     elseif p > curTotal then
-        p = 1
-        master_index = p
-        startCovers = false
-        GetNameSelected()
+	if showView == 6		 --@@ NEW!
+	and ((Controls.check(pad, SCE_CTRL_DOWN)) and not (Controls.check(oldpad, SCE_CTRL_DOWN)) or my > 180) --@@ NEW!
+	and math.floor((p-1) / 6) == math.floor((curTotal-1) / 6) then --@@ NEW!
+	    p = curTotal		 --@@ NEW!
+	else				 --@@ NEW!
+	    p = 1
+	    master_index = p
+	    startCovers = false
+	    GetNameSelected()
+	end				 --@@ NEW!
     end
 end
 
@@ -1817,7 +1829,7 @@ function OverrideCategory()
 	file:close()
 
 	-- Respec applies overrides, adds item to table, and set icon_path. Also used during startup scan.
-	xCatLookup(showCat)[p].app_type, xCatLookup(showCat)[p].icon_path = Respec_Entry(xCatLookup(showCat)[p], nil)
+	xCatLookup(showCat)[p].app_type, xCatLookup(showCat)[p].icon_path = Respec_Entry(xCatLookup(showCat)[p]) --@@, nil)
 	ovrrd_str = ""
 
 	-- force icon change
@@ -2098,82 +2110,82 @@ local function DrawCover(x, y, text, icon, sel, apptype, reflections)
 	extraz = -prevZ
 	rot = prevRot+prvRotY
     elseif showView == 1 then
-        -- flat zoom out view
-        space = 1.6
-        zoom = 0
-        if x > 0.5 then
-            extraz = 6
-            extrax = 1
+	-- flat zoom out view
+	space = 1.6
+	zoom = 0
+	if x > 0.5 then
+	    extraz = 6
+	    extrax = 1
 	    -- table.insert(tap_zones, {(x*96)+491, 213, 95, sel}) -- unused
-        elseif x < -0.5 then
-            extraz = 6
-            extrax = -1
+	elseif x < -0.5 then
+	    extraz = 6
+	    extrax = -1
 	    -- table.insert(tap_zones, {(x*96)+369, 213, 95, sel}) -- unused
-        end
+	end
     elseif showView == 2 then
-        -- smooth zoom-in view
-        space = 1.6
-        zoom = -1
-        extray = -0.6
+	-- smooth zoom-in view
+	space = 1.6
+	zoom = -1
+	extray = -0.6
 	extrax = x / space
 	rot = -extrax
-        --if x > 0.5 then
-        --    rot = -1
-        --    extraz = 0
-        --    extrax = 1
-        --elseif x < -0.5 then
-        --    rot = 1
-        --    extraz = 0
-        --    extrax = -1
-        --end
+	--if x > 0.5 then
+	--    rot = -1
+	--    extraz = 0
+	--    extrax = 1
+	--elseif x < -0.5 then
+	--    rot = 1
+	--    extraz = 0
+	--    extrax = -1
+	--end
     elseif showView == 3 then
-        -- smooth left side view
-        space = 1.5
-        zoom = -0.6
-        extray = -0.3
-        camX = 1
-        if x > space then
-            rot = -0.5
-            extraz = x * 0.833		 --simplified abs_side_factor + x
-            extrax = 0.6
-        elseif x > 0 then
-            rot = x * -0.333		 -- simplified -0.5 * abs_side_factor
-            extraz = x * 0.833		 -- simplified (abs_side_factor + x) / 2, which used to be 2 + (x / 2)
-            extrax = x * 0.4		 -- simplified 0.6 * abs_side_factor
-        elseif x < -0.5 then		 -- (1/4)
-            rot = 0.5			 -- (2/4) Remove these lines to stop items on the left from teleporting offscreen.
-            extraz = 2			 -- (3/4)
-            extrax = -10		 -- (4/4)
+	-- smooth left side view
+	space = 1.5
+	zoom = -0.6
+	extray = -0.3
+        camX = 1			 --@@ To use RetroFlow's 'planebg.obj', remove this line and for the next 4 extrax's... subtract 1 on them
+	if x > space then
+	    rot = -0.5
+	    extraz = x * 0.833		 --simplified abs_side_factor + x
+	    extrax = 0.6
+	elseif x > 0 then
+	    rot = x * -0.333		 -- simplified -0.5 * abs_side_factor
+	    extraz = x * 0.833		 -- simplified (abs_side_factor + x) / 2, which used to be 2 + (x / 2)
+	    extrax = x * 0.4		 -- simplified 0.6 * abs_side_factor
+	elseif x < -0.5 then		 -- (1/4)
+	    rot = 0.5			 -- (2/4) Remove these lines to stop items on the left from teleporting offscreen.
+	    extraz = 2			 -- (3/4)
+	    extrax = -10		 -- (4/4)
 	else				 -- x is -0.5 or below
-            rot = x * -0.333		 -- simplified 0 - abs_side_factor
+	    rot = x * -0.333		 -- simplified 0 - abs_side_factor
 	    extrax = x * 0.667		 -- simplified 0.5 * abs_side_factor
-        end
+	end
     elseif showView == 4 then
-        -- scroll around
-        space = 1
-        zoom = 0
-        if x > 0.5 then
-            extraz = 2 + (x / 1.5)
-            extrax = 1
-        elseif x < -0.5 then
-            extraz = 2 - (x / 1.5)
-            extrax = -1
-        end
+	-- scroll around
+	space = 1
+	zoom = 0
+	if x > 0.5 then
+	    extraz = 2 + (x / 1.5)
+	    extrax = 1
+	elseif x < -0.5 then
+	    extraz = 2 - (x / 1.5)
+	    extrax = -1
+	end
     else			 -- used to be if showView ~= 5 then
-        -- default view
-        space = 1
-        zoom = 0
-        if x > 0.5 then
-            rot = -1
-            extraz = 3
-            extrax = 1
-        elseif x < -0.5 then
-            rot = 1
-            extraz = 3
-            extrax = -1
-        end
+	-- default view
+	space = 1
+	zoom = 0
+	if x > 0.5 then
+	    rot = -1
+	    extraz = 3
+	    extrax = 1
+	elseif x < -0.5 then
+	    rot = 1
+	    extraz = 3
+	    extrax = -1
+	end
     end
-    
+
     Render.setCamera(camX, 0, 0, 0.0, 0.0, 0.0)
     
     if hideBoxes <= 0 then
@@ -2248,118 +2260,118 @@ local function DrawCover(x, y, text, icon, sel, apptype, reflections)
 		    Graphics.drawScaleImage(117, y, icon, 100 / icon_width, 100 / icon_height, fourtyalpha)
 		end
 	    end
-        elseif apptype==1 then
-            -- PSVita Boxes
-            if reflections == 1 then
-                Render.useTexture(modCover, icon)
-                Render.drawModel(modCover, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-                Render.drawModel(modBox, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverNoref, icon)
-                Render.drawModel(modCoverNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-                Render.drawModel(modBoxNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
-        elseif apptype==2 then
-            -- PSP Boxes
-            if reflections == 1 then
-                Render.useTexture(modCoverPSP, icon)
-                Render.drawModel(modCoverPSP, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-                Render.drawModel(modBoxPSP, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverPSPNoref, icon)
-                Render.drawModel(modCoverPSPNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-                Render.drawModel(modBoxPSPNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
-        elseif apptype==3 then
-            -- PSX Boxes
-            if reflections == 1 then
-                Render.useTexture(modCoverPSX, icon)
-                Render.drawModel(modCoverPSX, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-                Render.drawModel(modBoxPSX, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverPSXNoref, icon)
-                Render.drawModel(modCoverPSXNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-                Render.drawModel(modBoxPSXNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
+	elseif apptype==1 then
+	    -- PSVita Boxes
+	    if reflections == 1 then
+		Render.useTexture(modCover, icon)
+		Render.drawModel(modCover, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+		Render.drawModel(modBox, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverNoref, icon)
+		Render.drawModel(modCoverNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+		Render.drawModel(modBoxNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
+	elseif apptype==2 then
+	    -- PSP Boxes
+	    if reflections == 1 then
+		Render.useTexture(modCoverPSP, icon)
+		Render.drawModel(modCoverPSP, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+		Render.drawModel(modBoxPSP, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverPSPNoref, icon)
+		Render.drawModel(modCoverPSPNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+		Render.drawModel(modBoxPSPNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
+	elseif apptype==3 then
+	    -- PSX Boxes
+	    if reflections == 1 then
+		Render.useTexture(modCoverPSX, icon)
+		Render.drawModel(modCoverPSX, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+		Render.drawModel(modBoxPSX, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverPSXNoref, icon)
+		Render.drawModel(modCoverPSXNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+		Render.drawModel(modBoxPSXNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
 	elseif setRetroFlow == 0 then
-            -- Homebrew Icon
-            if reflections == 1 then
-                Render.useTexture(modCoverHbr, icon)
-                Render.drawModel(modCoverHbr, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverHbrNoref, icon)
-                Render.drawModel(modCoverHbrNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
-        elseif apptype==5 or apptype==6 then
+	    -- Homebrew Icon
+	    if reflections == 1 then
+		Render.useTexture(modCoverHbr, icon)
+		Render.drawModel(modCoverHbr, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverHbrNoref, icon)
+		Render.drawModel(modCoverHbrNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
+	elseif apptype==5 or apptype==6 then
 	    if inPreview == false	 -- n64_fix
 	    and showView == 1 then	 -- n64_fix
 		x = x - 0.45		 -- n64_fix
 	    end				 -- n64_fix
-            if reflections == 1 then
-                Render.useTexture(modCoverN64, icon)
-                Render.drawModel(modCoverN64, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverN64Noref, icon)
-                Render.drawModel(modCoverN64Noref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
-        elseif apptype==7 or apptype==12 or apptype==17 or apptype==18 or apptype==19 or apptype==20 or apptype==21 or apptype==23 or apptype==24 or apptype==25 or apptype==36 then
-            if reflections == 1 then
-                Render.useTexture(modCoverNES, icon)
-                Render.drawModel(modCoverNES, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverNESNoref, icon)
-                Render.drawModel(modCoverNESNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
-        elseif apptype==8 or apptype==9 or apptype==10 or apptype==11 then
-            if reflections == 1 then
-                Render.useTexture(modCoverGB, icon)
-                Render.drawModel(modCoverGB, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverGBNoref, icon)
-                Render.drawModel(modCoverGBNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
-        elseif apptype==13 or apptype==14 or apptype==15 or apptype==16 then
-            if reflections == 1 then
-                Render.useTexture(modCoverMD, icon)
-                Render.drawModel(modCoverMD, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverMDNoref, icon)
-                Render.drawModel(modCoverMDNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
-        elseif apptype==22 or apptype==27 or apptype==28 or apptype==29 then
-            if reflections == 1 then
-                Render.useTexture(modCoverTAPE, icon)
-                Render.drawModel(modCoverTAPE, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverTAPENoref, icon)
-                Render.drawModel(modCoverTAPENoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
-        elseif apptype==30 or apptype==31 or apptype==32 or apptype==34 or apptype==35 then
-            if reflections == 1 then
-                Render.useTexture(modCoverATARI, icon)
-                Render.drawModel(modCoverATARI, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverATARINoref, icon)
-                Render.drawModel(modCoverATARINoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
-        elseif apptype==26 or apptype==33 then
-            if reflections == 1 then
-                Render.useTexture(modCoverLYNX, icon)
-                Render.drawModel(modCoverLYNX, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverLYNXNoref, icon)
-                Render.drawModel(modCoverLYNXNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
-        else
-            -- Homebrew Icon
-            if reflections == 1 then
-                Render.useTexture(modCoverHbr, icon)
-                Render.drawModel(modCoverHbr, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            else
-                Render.useTexture(modCoverHbrNoref, icon)
-                Render.drawModel(modCoverHbrNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
-            end
-        end
+	    if reflections == 1 then
+		Render.useTexture(modCoverN64, icon)
+		Render.drawModel(modCoverN64, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverN64Noref, icon)
+		Render.drawModel(modCoverN64Noref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
+	elseif apptype==7 or apptype==12 or apptype==17 or apptype==18 or apptype==19 or apptype==20 or apptype==21 or apptype==23 or apptype==24 or apptype==25 or apptype==36 then
+	    if reflections == 1 then
+		Render.useTexture(modCoverNES, icon)
+		Render.drawModel(modCoverNES, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverNESNoref, icon)
+		Render.drawModel(modCoverNESNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
+	elseif apptype==8 or apptype==9 or apptype==10 or apptype==11 then
+	    if reflections == 1 then
+		Render.useTexture(modCoverGB, icon)
+		Render.drawModel(modCoverGB, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverGBNoref, icon)
+		Render.drawModel(modCoverGBNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
+	elseif apptype==13 or apptype==14 or apptype==15 or apptype==16 then
+	    if reflections == 1 then
+		Render.useTexture(modCoverMD, icon)
+		Render.drawModel(modCoverMD, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverMDNoref, icon)
+		Render.drawModel(modCoverMDNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
+	elseif apptype==22 or apptype==27 or apptype==28 or apptype==29 then
+	    if reflections == 1 then
+		Render.useTexture(modCoverTAPE, icon)
+		Render.drawModel(modCoverTAPE, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverTAPENoref, icon)
+		Render.drawModel(modCoverTAPENoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
+	elseif apptype==30 or apptype==31 or apptype==32 or apptype==34 or apptype==35 then
+	    if reflections == 1 then
+		Render.useTexture(modCoverATARI, icon)
+		Render.drawModel(modCoverATARI, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverATARINoref, icon)
+		Render.drawModel(modCoverATARINoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
+	elseif apptype==26 or apptype==33 then
+	    if reflections == 1 then
+		Render.useTexture(modCoverLYNX, icon)
+		Render.drawModel(modCoverLYNX, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverLYNXNoref, icon)
+		Render.drawModel(modCoverLYNXNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
+	else
+	    -- Homebrew Icon
+	    if reflections == 1 then
+		Render.useTexture(modCoverHbr, icon)
+		Render.drawModel(modCoverHbr, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    else
+		Render.useTexture(modCoverHbrNoref, icon)
+		Render.drawModel(modCoverHbrNoref, x + extrax, y + extray, -5 - extraz - zoom, 0, math.deg(rot), 0)
+	    end
+	end
     end
 end
 
@@ -2369,10 +2381,10 @@ function FreeIcons()
     FileLoad = {}
     Threads.clear()
     for k, v in pairs(files_table) do	 -- Due to LuaJIT table recursion, clearing the "All" table clears every table.
-        if v.ricon then
-            Graphics.freeImage(v.ricon)
-            v.ricon = nil
-        end
+	if v.ricon then
+	    Graphics.freeImage(v.ricon)
+	    v.ricon = nil
+	end
     end
 end
 
@@ -2727,13 +2739,32 @@ while true do
 	    Graphics.drawLine(21, 940, 496, 496, white)
 	end
         h, m, s = System.getTime()
-	Font.print(fnt20, 726, 34, string.format("%02d:%02d", h, m), white)-- Draw time
+    --@@Font.print(fnt20, 726, 34, string.format("%02d:%02d", h, m), white)-- Draw time
+	m = string.format("%02d", m) --@@ 5 ----> 05
+	if h < 12 then
+	    if h == 0 then
+		h = 12
+	    end
+--@@	    Font.print(fnt14, 726 - 18 + Font.getTextWidth(fnt20, h .. ":" .. m), 40, "AM", white)-- AM @@ How RetroFlow handles AM/PM
+	    Font.print(fnt15, 726 - 18 + Font.getTextWidth(fnt20, h .. ":" .. m), 39, "AM", white)-- AM
+	else
+	    if h >= 13 then
+		h = h - 12
+	    end
+--@@	    Font.print(fnt14, 726 - 18 + Font.getTextWidth(fnt20, h .. ":" .. m), 40, "PM", white)-- PM @@ How RetroFlow handles AM/PM
+	    Font.print(fnt15, 726 - 18 + Font.getTextWidth(fnt20, h .. ":" .. m), 39, "PM", white)-- PM
+	end
+	Font.print(fnt20, 726 - 25, 34, h .. ":" .. m, white)-- Draw time
 	life = System.getBatteryPercentage()
-	Font.print(fnt20, 830, 34, life .. "%", white)-- Draw battery
-	Graphics.drawImage(888, 41, imgBattery)
-	Graphics.fillRect(891, 891 + (life / 5.2), 45, 53, white)
+    --@@Font.print(fnt20, 830, 34, life .. "%", white)-- Draw battery
+	Font.print(fnt20, 840, 34, life .. "%", white)-- Draw battery
+    --@@Graphics.drawImage(888, 41, imgBattery)
+	Graphics.drawImage(888, 39, imgBattery)
+    --@@Graphics.fillRect(891, 891 + (life / 5.2), 45, 53, white)
+        Graphics.fillRect(891, 891 + (life / 5.2), 43, 51, white)
 	if Network.isWifiEnabled() then
-	    Graphics.drawImage(800, 38, imgWifi)-- wifi icon
+	--@@Graphics.drawImage(800, 38, imgWifi)-- wifi icon
+            Graphics.drawImage(798, 35, imgWifi)-- wifi icon
 	end
 	-- END HEADER
 
@@ -3194,11 +3225,12 @@ while true do
 	elseif getBGround == 6 then
 	    BGroundText = lang_lines[69] --Dark
 	elseif getBGround == 7 then
-	    BGroundText = lang_lines[74] --Playstation Pattern
+	    BGroundText = lang_lines[74] -- Playstation Pattern 1 @@ used to be just 'Playstation Pattern'
 	elseif getBGround == 8 then
-	    BGroundText = lang_lines[71] --Retro
+	    BGroundText = lang_lines[75] --@@ NEW! Playstation Pattern 2
 	elseif getBGround == 9 then
-	    BGroundText = lang_lines[72] --SwitchView Basic Black
+	    BGroundText = lang_lines[71] --@@ NEW! Retro	  @@ Now on slot 9
+	--@@BGroundText = lang_lines[72] --SwitchView Basic Black @@ Unused now
 	else
 	    BGroundText = lang_lines[23] --OFF
 	end
@@ -3571,13 +3603,11 @@ while true do
 		elseif menuY==2 then		 --covers download selection -- [1]=PS VITA, [2]=HOMEBREWS, [3]=PSP, [4]=PSX, [5]=CUSTOM, [default]=ALL
 		    getCovers = Category_Minus(getCovers-1)
 		elseif menuY==3 then		 --Background selection
-		-- [1]=Custom, [2]=Citylights, [3]=Aurora, [4]=Crystal, [5]=Wood, [6]=Dark, [7]=Playstation Pattern, [8]=Retro.
+		-- [1]=Custom, [2]=Citylights, [3]=Aurora, [4]=Crystal, [5]=Wood, [6]=Dark, [7]=Playstation Pattern 1, [8]=Playstation Pattern 2, [9]=Retro.
 		    if getBGround > 0 then
 			getBGround = getBGround - 1
-		  --elseif setSwitch == 1 then
-		  --	getBGround = 9
 		    else
-			getBGround = 8
+			getBGround = 9		 --@@ NEW! Used to be 8
 		    end
 		    background_brackets = true
 		elseif menuY == 11 then
@@ -3599,10 +3629,8 @@ while true do
 		elseif menuY==2 then				 --covers download selection -- [1]=PS VITA, [2]=HOMEBREWS, [3]=PSP, [4]=PSX, [5]=CUSTOM, [default]=ALL
 		    getCovers = Category_Plus(getCovers+1)
 		elseif menuY==3 then				 --Background selection
-		-- [1]=Custom, [2]=Citylights, [3]=Aurora, [4]=Crystal, [5]=Wood, [6]=Dark, [7]=Playstation Pattern, [8]=Retro.
-		  --if getBGround == 8 and setSwitch == 1 then
-		  --	getBGround = 9
-		    if getBGround < 8 then
+		-- [1]=Custom, [2]=Citylights, [3]=Aurora, [4]=Crystal, [5]=Wood, [6]=Dark, [7]=Playstation Pattern 1, [8]=Playstation Pattern 2, [9]=Retro.
+		    if getBGround < 9 then	 --@@ NEW! Used to be 8
 			getBGround = getBGround + 1
 		    else
 			getBGround = 0
@@ -3634,7 +3662,7 @@ while true do
 	Graphics.fillRect(30, 930, 24, 496, darkalpha)-- bg
 
 	Font.print(fnt20, 54, 42, "HexFlow Custom - version " .. appversion .. " by BlackSheepBoy69\nRevamp mod for VitaHEX's HexFlow Launcher 0.5\nSupport the original creator on patreon.com/vitahex", white)-- Draw info
-	--@@Font.print(fnt15, 690, 42, "Sort time: ".. sortTime .. " ms.\nRead time: ".. applistReadTime .. " ms.\nFunction Load time: ".. functionTime .. " ms.\nOne Loop time: ".. oneLoopTime .. " ms.", white)
+	--Font.print(fnt15, 690, 42, "Sort time: ".. sortTime .. " ms.\nRead time: ".. applistReadTime .. " ms.\nFunction Load time: ".. functionTime .. " ms.\nOne Loop time: ".. oneLoopTime .. " ms.", white)
 	Font.print(fnt15, 690, 34, "Sort time: ".. sortTime .. " ms.\nRead time: ".. applistReadTime .. " ms.\nFunction Load time: ".. functionTime .. " ms.\nOne Loop time: ".. oneLoopTime .. " ms.\nSCUMMVM time: ".. SCUMMVMTime .. " ms.", white)
 	Graphics.drawLine(30, 930, 124, 124, white)
 	Graphics.drawLine(30, 930, 384, 384, white)
@@ -3642,9 +3670,9 @@ while true do
 	    .. "\n\nCustom Covers & RetroFlow (requires 'RetroFlow' installed)\nPlace your custom covers in 'ux0:/data/HexFlow/COVERS/PSVITA' or '/PSP' or '/PS1'\nCover images must be in png format and file name must match the App ID or App Name.\nRespectively, 'RetroFlow: ON' lets it read from 'ux0:data/RetroFlow/COVERS' and '/ROMS'"
 	    .. "\n\nCustom Category\nTake the file 'ux0:/data/HexFlow/applist.dat' and rename it to customsort.dat then\nrearrange the titles how you like. It will spawn in a new category ('Custom')"
 	    .. "\n\nCredit to VitaHEX, Sakis RG, and everyone who worked on HexFlow Launcher 0.5 which"
-	    .. "\nthis is based on, jimbob4000 and everyone who worked on RetroFlow Launcher 5.0.2, for"
-	    .. "\ngeneral support/inspiration, Rinnegatamante for Lua Player Plus, Axce, Fwannmacher"
-	    .. "\nDaRk_ViVi, yzzyx-network, all translators, and one or more coders anonymous.", white)-- Draw info
+	    .. "\nthis is based on, jimbob4000 and everyone who worked on RetroFlow Launcher 7.1.0 as well"
+	    .. "\nas nowhere_man87 for love & support, Rinnegatamante for Lua Player Plus, Fwannmacher,"
+	    .. "\nAxce, DaRk_ViVi, yzzyx-network, all translators, and one or more coders anonymous.", white)-- Draw info
 
     end
     
