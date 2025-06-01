@@ -6,6 +6,7 @@
 <p>Display and launch your games and homebrews in style.<br /><strong>HexFlow Launcher</strong> features a 3d user interface to display your games with their box art and supports many customization options like custom covers, backgrounds, and - in v0.6 and above - one custom category.</p>
 <p>Launching a game/app from <strong>HexFlow Launcher</strong> will close the launcher automaticaly without asking.</p>
 <p><strong>Now compatible with Adrenaline Launcher and Adrenaline Bubble Manager for launching PS1/PSP games either without bubbles, or with your custom bubbles!</strong></p>
+<p>Enable RetroFlow mode to launch all your ROMS directly, if they are in the same folders that RetroFlow reads them from (The RetroFlow data folder's ROMS section). Great for people who already had the very popular 'RetroFlow' set up and want to try this app.</p>
 <h2>Custom Covers</h2>
 <p>Place your custom covers in "<em>ux0:/data/HexFlow/COVERS/PSVITA/</em>" and similar.</p>
 <p>If RetroFlow is enabled, Retro covers can be found in "<em>ux0:/data/RetroFlow/COVERS/</em>"</p>
