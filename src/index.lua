@@ -21,15 +21,15 @@ function System.currentDirectory(dir)
     end
 end
 
-local pspemu_dir = "ux0:/pspemu"	 --@@ NEW!
-function System.GetPSPDirectory()	 --@@ NEW! Check which SD card has the most PSP games.
-    if #(System.listDirectory("uma0:/pspemu/PSP/GAME") or {}) + #(System.listDirectory("uma0:/pspemu/ISO") or {}) > #(System.listDirectory("ux0:/pspemu/PSP/GAME") or {}) + #(System.listDirectory("ux0:/pspemu/ISO") or {}) then --@@ NEW!
-	pspemu_dir = "uma0:/pspemu"	 --@@ NEW!
-    else				 --@@ NEW!
-	pspemu_dir = "ux0:/pspemu"	 --@@ NEW! Defaults to this if they're equal
-    end					 --@@ NEW!
-end					 --@@ NEW!
-System.GetPSPDirectory()		 --@@ NEW!
+local pspemu_dir = "ux0:/pspemu"
+function System.GetPSPDirectory()	 -- Check which SD card has the most PSP games.
+    if #(System.listDirectory("uma0:/pspemu/PSP/GAME") or {}) + #(System.listDirectory("uma0:/pspemu/ISO") or {}) > #(System.listDirectory("ux0:/pspemu/PSP/GAME") or {}) + #(System.listDirectory("ux0:/pspemu/ISO") or {}) then
+	pspemu_dir = "uma0:/pspemu"
+    else
+	pspemu_dir = "ux0:/pspemu"	 -- Defaults to this if they're equal
+    end
+end
+System.GetPSPDirectory()
 
 Network.init()
 -- This app uses the RetroFlow cover archive: https://github.com/jimbob4000/hexflow-covers/
@@ -118,13 +118,13 @@ for _, v in pairs(System.listDirectory(cur_dir) or {}) do	 -- this "or {}" makes
     end
 end
 
-local quick_app_list = {}		 --@@ NEW!
-function make_quick_app_list(t1)	 --@@ NEW! This function and instant_cover_finder() are core components of rolling cache
-    quick_app_list = {}			 --@@ NEW!
-    for k, v in ipairs(t1) do		 --@@ NEW!
-	quick_app_list[v.name] = k	 --@@ NEW!
-    end					 --@@ NEW!
-end					 --@@ NEW!
+local quick_app_list = {}
+function make_quick_app_list(t1)	 -- This function and instant_cover_finder() are core components of rolling cache
+    quick_app_list = {}
+    for k, v in ipairs(t1) do
+	quick_app_list[v.name] = k
+    end
+end
 
 if not cur_quick_dir["overrides.dat"] then
     local file_over = System.openFile(cur_dir .. "/overrides.dat", FCREATE)
@@ -141,8 +141,8 @@ if not cur_quick_dir["lastplayedgame.dat"] then
 end
 
 local showView = 0	 -- Localized here so RetroFlow placeholders can be loaded.
-local adrLauncher = 0	 --@@ NEW! -- 0 OFF, 1 ux0, 2 uma0
-local getAdr = 0	 --@@ NEW!
+local adrLauncher = 0	 -- 0 OFF, 1 ux0:/, 2 uma0:/
+local getAdr = 0
 
 -- load 3D models and textures
 local modBackground = Render.loadObject("app0:/DATA/planebg.obj", imgBack)
@@ -214,9 +214,8 @@ function load_RetroFlow()
 	System.exit()
     end
 
---  function launch_NooDS(romfile)
---	System.executeUri("psgm:play?titleid=NOODSVITA" .. "&param=" .. romfile)
---@@	System.executeUri("psgm:play?titleid=DSVITA000" .. "&param=" .. romfile) --@@ new but unused
+--  function launch_DSVita(romfile)
+--	System.executeUri("psgm:play?titleid=DSVITA000" .. "&param=" .. romfile)
 --	System.exit()
 --  end
 
@@ -225,11 +224,11 @@ function load_RetroFlow()
 	System.exit()
     end
 
-    --@@ NEW! The RetroFlow counterpart of this function is CHUNKY. This one is very compressed, but should be just as good.
+    -- RetroFlow's version of this function is CHUNKY. This should be just as good.
     function launch_Adrenaline(romfile, def_driver)
-	romfile = string.lower(romfile):gsub("0:/", "0:", 1)	  --@@ Example: "ux0:pspemu/iso/dantes_inferno.iso"
-	def_driver = tostring(def_driver) --@@ Options: "INFERN0", "MARCH33", "NP9660"
-	local PSBtn = ""		  --@@ Options: "Menu", "LiveArea", "Standard"
+	romfile = string.lower(romfile):gsub("0:/", "0:", 1)		 -- "ux0:pspemu/iso/dantes_inferno.iso"
+	def_driver = tostring(def_driver)				 -- "INFERN0", "MARCH33", "NP9660"
+	local PSBtn = ""						 -- "Menu", "LiveArea", "Standard"
 	local number = 0
 
 	if System.doesFileExist(romfile .. "/EBOOT.PBP") then
@@ -237,7 +236,7 @@ function load_RetroFlow()
 	end
 
     	-- Delete the old Adrenaline Launch files
-        System.deleteFile("ux0:/app/RETROLNCR/data/boot.inf")	 --@@ Delete a file that may conflict with the launch.
+        System.deleteFile("ux0:/app/RETROLNCR/data/boot.inf")		 -- Delete a file that may conflict with the launch.
 
 	local file_over = System.openFile("ux0:/app/RETROLNCR/data/boot.bin", FCREATE)
 	io.open("ux0:/app/RETROLNCR/data/boot.bin","w"):close()	 -- Clear old Adrenaline Launcher file
@@ -247,20 +246,20 @@ function load_RetroFlow()
 	number = 0
 
 	-- (0x04) Driver
-	if driver == "MARCH33" then	 number = "ABB\x00\x01\x00\x00\x00" --@@ MARCH33
-	elseif driver == "NP9660" then	 number = "ABB\x00\x02\x00\x00\x00" --@@ NP9660
-	else				 number = "ABB\x00\x00\x00\x00\x00" --@@ INFERNO
+	if driver == "MARCH33" then	 number = "ABB\x00\x01\x00\x00\x00" -- MARCH33
+	elseif driver == "NP9660" then	 number = "ABB\x00\x02\x00\x00\x00" -- NP9660
+	else				 number = "ABB\x00\x00\x00\x00\x00" -- INFERNO
 	end
 	file:write(number .. "\x00\x00\x00\x00\x01\x00")
-	--@@ Define source as Adrenaline Bubble Builder ("ABB\x00"), then four bytes for the driver, four '\x00' bytes saying that it's an eboot.bin, then one '\x01' byte for an unknown reason
+	-- Define source as Adrenaline Bubble Builder ("ABB\x00"), then four bytes for the driver, four '\x00' bytes saying that it's an eboot.bin, then one '\x01' byte for an unknown reason
 
 	-- (0x14) PSbutton 00 Menu 01 LiveArea 02 Standard
-	if PSBtn == "LiveArea" then	 number = "\x01\x00\x00\x00" --@@ LiveArea
-	elseif PSBtn == "Standard" then	 number = "\x02\x00\x00\x00" --@@ Standard
-	else				 number = "\x00\x00\x00\x00" --@@ Menu
+	if PSBtn == "LiveArea" then	 number = "\x01\x00\x00\x00"	 -- LiveArea
+	elseif PSBtn == "Standard" then	 number = "\x02\x00\x00\x00"	 -- Standard
+	else				 number = "\x00\x00\x00\x00"	 -- Menu
 	end
 	file:write(number .. "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
-	--@@ Define what'll happen when you hit the PS button, then filler until romfile gets written: at the 64th to 256th bytes.
+	-- Define what'll happen when you hit the PS button, then filler until romfile gets written: at the 64th to 256th bytes.
 
 	-- (0x40) Path to game 
 	local fill = 256 - #romfile
@@ -278,12 +277,12 @@ function load_RetroFlow()
     end
 
     function xRomDirLookup(rdir)
-	if rdir == 1 then return	 pspemu_dir .. "/PSP/GAME/"	 --@@ NEW!
-	elseif rdir == 2 then return	 pspemu_dir .. "/ISO/"		 --@@ NEW!
+	if rdir == 1 then return	 pspemu_dir .. "/PSP/GAME/"
+	elseif rdir == 2 then return	 pspemu_dir .. "/ISO/"
 	elseif rdir == 5 then return	 "ux0:data/RetroFlow/ROMS/Nintendo - Nintendo 64/"
 	elseif rdir == 6 then return	 "ux0:data/RetroFlow/ROMS/Nintendo - Super Nintendo Entertainment System/"
 	elseif rdir == 7 then return	 "ux0:data/RetroFlow/ROMS/Nintendo - Nintendo Entertainment System/"
-      --elseif rdir ==   then return	 "ux0:data/RetroFlow/ROMS/Nintendo - Nintendo DS/" --@@ or "ux0:data/dsvita/"
+      --elseif rdir ==   then return	 "ux0:data/RetroFlow/ROMS/Nintendo - Nintendo DS/"	 -- "ux0:data/dsvita/"
 	elseif rdir == 8 then return	 "ux0:data/RetroFlow/ROMS/Nintendo - Game Boy Advance/"
 	elseif rdir == 9 then return	 "ux0:data/RetroFlow/ROMS/Nintendo - Game Boy Color/"
 	elseif rdir == 10 then return	 "ux0:data/RetroFlow/ROMS/Nintendo - Game Boy/"
@@ -322,7 +321,7 @@ function load_RetroFlow()
     end
 
     function xSIconLookup(square_type)		 -- Placeholder icons in Triangle Menu and SwitchView
-	if square_type == 2 then	 return	"app0:/DATA/icon_psp.png"	 --@@ NEW!
+	if square_type == 2 then	 return	"app0:/DATA/icon_psp.png"
 	elseif square_type == 5 then	 return "app0:/DATA/icon_n64.png"
 	elseif square_type == 6 then	 return "app0:/DATA/icon_snes.png"
 	elseif square_type == 7 then	 return "app0:/DATA/icon_nes.png"
@@ -392,7 +391,7 @@ function load_RetroFlow()
 	local tmp_covers_list = {}
 	local custom_path = ""
 
-	if tmpap == 2 then	 --@@ NEW! For adrLauncher
+	if tmpap == 2 then	 -- For adrLauncher
 	    coverspath = covers_psp
 	    tmp_covers_list = switch_generator(covers_psp)
 	elseif tmpap == 3 then
@@ -566,10 +565,10 @@ local app_title = info.title
 local app_short_title = info.short_title
 local app_category = info.category
 local app_titleid = info.titleid
-local app_size = 0		 --@@ NEW!
+local app_size = 0
 local app_size_text = "0"
 local DISC_ID = false		 -- can be a string or a bool false
-local launch_mode = 0		 --@@ NEW! Now localized.
+local launch_mode = 0
 
 local master_index = 1
 local p = 1
@@ -635,7 +634,7 @@ local getBGround = 1	 --0 Off, 1 Custom, 2 Citylights, 3 Aurora, 4 "Wood 1", 5 "
 local BGroundText = "-"
 local tmpappcat = 0
 local background_brackets = true
-local adrenaline_brackets = true		 --@@ NEW!
+local adrenaline_brackets = true
 
 local prevX = 0
 local prevZ = 0
@@ -644,7 +643,7 @@ local prevRot = 0
 --local total_all = 0
 --local total_games = 0
 --local total_homebrews = 0
-local total_pspemu = 0				 --@@ NEW!
+local total_pspemu = 0
 --local total_roms = 0
 local total_apps = 0
 local curTotal = 0
@@ -669,7 +668,7 @@ local View5VitaCropTop = 1
 local lockView = 0
 local showRecentlyPlayed = 1
 local swapXO = 0
---@@local setFaveHeart = 1			 --@@ new but unused
+--local setFaveHeart = 1			 -- unused
 --local smoothScrolling = 0			 -- unused
 --local arcadeMerge = 0				 -- unused
 
@@ -697,9 +696,9 @@ function write_config()
 	.. lockView
 	.. showRecentlyPlayed
 	.. string.format("%02d", startCategory)	 -- Always saves as double digits
-	.. adrLauncher				 --@@ NEW! Used to be setLanguage 'tens digit' which was always 0
-	.. 0					 --@@ NEW! Used to be setLanguage 'ones digit'
-	.. 0					 --@@ NEW! Used to be swapXO in v2.1. Will probably be used for setFaveHeart in the next version
+	.. adrLauncher				 -- Used to be setLanguage 'tens digit' which was always 0
+	.. 0					 -- Used to be setLanguage 'ones digit'
+	.. 0					 -- Used to be swapXO in v2.1. Will probably be used for setFaveHeart in the next version
     ), 21)
     System.closeFile(file_config)
 end
@@ -721,7 +720,7 @@ function reset_eboot_apptitle()
     inp:close()
 
     if string.find(data,"TITLE%c%c%c%c%c%c%cME") == 289 then
-	return sanitize(string.sub(data, 857, -1):match("([^%c]+)"))	 --@@ Wizardry v2
+	return sanitize(string.sub(data, 857, -1):match("([^%c]+)"))	 -- Wizardry v2
     else
 	return "-"
     end
@@ -730,31 +729,31 @@ end
 
 function readBin(filename, allow_iso_scan)	 -- returns a string or nil
     local path_game = nil
-    local data = ""				 --@@ NEW! Localized here now
-    if allow_iso_scan == ".iso" then		 --@@ NEW!
-	allow_iso_scan = "true"			 --@@ NEW!
-	data = filename				 --@@ NEW!
+    local data = ""
+    if allow_iso_scan == ".iso" then
+	allow_iso_scan = "true"
+	data = filename
     elseif System.doesFileExist(filename) and string.match(filename, ".bin") then
 	local inp = assert(io.open(filename, "rb"), "Failed to open boot.bin")
 	inp:seek("set",64)				 -- Skip early junk bytes
 	data = inp:read("*all"):gsub("%c", "")	 -- gsub %c skips late junk bytes. Result: "ux0:pspemu/psp/game/slus00453/eboot.pbp"
 	inp:close()
-    else					 --@@ NEW!
-	return					 --@@ NEW!
-    end						 --@@ NEW!
+    else
+	return
+    end
 
     -- Supports PSP .iso files and PSX2PSP .eboot files
 
     if data:sub(-10):upper() == "/EBOOT.PBP" then
 	path_game = string.sub(data, -19, -11)	 -- Gets the "slus00453" from "ux0:pspemu/psp/game/slus00453/eboot.pbp"
 	app_size_text = app_size_text .. " (" .. string.format("%02d", getAppSize(data:sub(0, -10))/1024/1024) .. "Mb)"	 -- Example: "01Mb (512Mb)"
-	if allow_iso_scan == "false" then	 --@@ NEW!
-	    local path_game = "-"		 --@@ NEW! prevents the 'return' at the END of this function from returning.
-	    if System.doesFileExist(data)	 --@@ NEW!
-	    and io.open(data):read(1000):find("TITLE%c%c%c%c%c%c%cME") == 289 then --@@ NEW! Note: this is an unprotected io.open
-		return "PSX"			 --@@ NEW!
-	    end					 --@@ NEW!
-	end					 --@@ NEW!
+	if allow_iso_scan == "false" then
+	    local path_game = "-"		 -- prevents the 'return' at the END of this function from returning.
+	    if System.doesFileExist(data)
+	    and io.open(data):read(1000):find("TITLE%c%c%c%c%c%c%cME") == 289 then	 -- an unprotected io.open
+		return "PSX"
+	    end
+	end
     elseif allow_iso_scan == "true"
      and data:sub(-4):upper() == ".ISO"
      and System.doesFileExist(data) then		 -- Example: "ux0:pspemu/ISO/Dantes_Inferno.iso"
@@ -762,7 +761,6 @@ function readBin(filename, allow_iso_scan)	 -- returns a string or nil
 	 inp:seek("set",33651)
 	 path_game = inp:read(10)
 	 inp:close()
---@@	 error(path_game)			 --@@ new but unused. Causes a crash on purpose for debugging purposes
 	 if path_game ~= nil then
 	    path_game = path_game:gsub("-", "")
 	 end
@@ -770,7 +768,6 @@ function readBin(filename, allow_iso_scan)	 -- returns a string or nil
 	    app_size_text = app_size_text .. " (" .. string.format("%02d", System.sizeFile(inp)/1024/1024) .. "Mb)"
 	System.closeFile(inp)
     end
---@@end
     if path_game and not path_game:match("%W") then	 -- Only return valid path_game that DON'T have NON-alphanumeric characters.
 	return path_game:upper()			 -- Example: SLUS00453
     end
@@ -808,7 +805,7 @@ if cur_quick_dir["config.dat"] then
     lockView =		 tonumber(string.sub(str, 15, 15)) or lockView
     showRecentlyPlayed = tonumber(string.sub(str, 16, 16)) or showRecentlyPlayed
     startCategory =	 tonumber(string.sub(str, 17, 18)) or startCategory	 -- Upgraded to double digits
-    adrLauncher =	 tonumber(string.sub(str, 19, 19)) or adrLauncher	 --@@ NEW!
+    adrLauncher =	 tonumber(string.sub(str, 19, 19)) or adrLauncher
 else
     write_config()
 end
@@ -823,6 +820,10 @@ if showView > 4 then
 	showView = 0
     end
 end
+
+if lockView > 1 then	 --@@ NEW!
+    lockView = 0	 --@@ NEW!
+end			 --@@ NEW!
 
 
 -- Custom Backgrounds
@@ -956,14 +957,12 @@ function ChangeLanguage()
     end
 
     if fontfile_old ~= fontfile then		 -- Not necessary if language is made unchangeable
---@@	fnt14 = Font.load(fontfile)		--@@ How RetroFlow handles AM/PM
 	fnt15 = Font.load(fontfile)
 	fnt20 = Font.load(fontfile)
 	fnt22 = Font.load(fontfile)
 	fnt23_5 = Font.load(fontfile)		 -- For SwitchView
 	fnt25 = Font.load(fontfile)
 
---@@	Font.setPixelSizes(fnt14, 14)		--@@ How RetroFlow handles AM/PM
 	Font.setPixelSizes(fnt15, 15)
 	Font.setPixelSizes(fnt20, 20)
 	Font.setPixelSizes(fnt22, 22)
@@ -1221,7 +1220,7 @@ function CoverDirectoryLookup(getCovers)  -- For categoric cover downloads
 end
 
 -- Resets an entry's app_type and respective icon_path based on overrides.dat
-function Respec_Entry(file) --@@, pspemu_translate_tmp)
+function Respec_Entry(file)
     custom_path, custom_path_id, custom_path_psx = nil, nil, nil
     if file.directory and ovrrd_str then	 -- the directory check is only here so the app functions exactly like HEXflow launcher v0.5, it's probably not necessary at all.
 	--0 default, 1 vita, 2 psp, 3 psx, 4 homebrew
@@ -1236,10 +1235,9 @@ function Respec_Entry(file) --@@, pspemu_translate_tmp)
 	end
     end
 
---@@if (file.launch_type ~= 0) or (setRetroFlow ~= 1) or (adrLauncher < 1) or not string.find(file.name, "PSPEMU%d%d%d") then --@@ new but unused
-    if (setRetroFlow ~= 1) or (adrLauncher == 0) or not string.find(file.name, "PSPEMU%d%d%d") then --@@ NEW!
+    if (setRetroFlow ~= 1) or (adrLauncher == 0) or not string.find(file.name, "PSPEMU%d%d%d") then
 	table.insert(xCatLookup(appt_hotfix(file.app_type)), file)
-    end	 --@@ NEW!
+    end
 
     custom_path =    CoverDirectoryLookup(file.app_type) .. app_short_title .. ".png"
     custom_path_id = CoverDirectoryLookup(file.app_type) .. file.name .. ".png"
@@ -1268,23 +1266,19 @@ end
 -- name:string, 
 -- app_type:number (0 homebrew, 1 psvita, 2 psp, 3 psx)
 -- }
-function CacheTitleTable(output_file)						 --@@ NEW! Added output file parameter
-    if output_file == "apptitlecache.dat" then					 --@@ NEW!
+function CacheTitleTable(output_file)
+    if output_file == "apptitlecache.dat" then
 	OneShotPrint() --Basic Loading Screen
-    end										 --@@ NEW!
---@@local file_over = System.openFile(cur_dir .. "/apptitlecache.dat", FCREATE)
---@@cur_quick_dir["apptitlecache.dat"] = true
-    local file_over = System.openFile(cur_dir .. "/" .. output_file, FCREATE)	 --@@ NEW!
-    cur_quick_dir[output_file:lower()] = true					 --@@ NEW!
+    end
+    local file_over = System.openFile(cur_dir .. "/" .. output_file, FCREATE)
+    cur_quick_dir[output_file:lower()] = true
 
     -- Clear apptitlecache.dat data. Might be necessary if you delete 2 apps and add 1?
---@@io.open(cur_dir .. "/apptitlecache.dat","w"):close()
-    io.open(cur_dir .. "/" .. output_file,"w"):close()				 --@@ NEW!
+    io.open(cur_dir .. "/" .. output_file,"w"):close()
 
     System.closeFile(file_over)
 
---@@file = io.open(cur_dir .. "/apptitlecache.dat", "w")
-    file = io.open(cur_dir .. "/" .. output_file, "w")				 --@@ NEW!
+    file = io.open(cur_dir .. "/" .. output_file, "w")
 
     for _, v in pairs(folders_table) do
 	local entry_data = {v.directory, v.size, "-2121791736", v.icon_path, v.apptitle, v.name, v.app_type}
@@ -1349,12 +1343,11 @@ function p_minus(minus_num)
 end
 
 -- Loads cache if it exists, or generates a new one if it doesn't.
-function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to handle PS1 better, though it's kind of spaghetti code tbh
+function LoadAppTitleTables(cache_injection)	 -- Can now cache inject to handle PS1 better, though it's kind of spaghetti code tbh
     local applistReadTimer = Timer.new()
 
     files_table = {}
---@@folders_table = {}
-    folders_table = cache_injection or {}	 --@@ NEW!
+    folders_table = cache_injection or {}
     games_table = {}
     homebrews_table = {}
     psp_table = {}
@@ -1538,18 +1531,17 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 
     end
 
-    if setRetroFlow == 1 and adrLauncher == 1 then				 --@@ NEW!
-	psp_table =	 Read_Rom_Dir(2, {".iso", ".cso"})			 --@@ NEW!
-	psx_table =	 Read_Rom_Dir(3, {".cue", ".img", ".mdf", ".pbp", ".toc", ".cbn", ".m3u", ".ccd", ".chd"}) --@@ NEW!
-    end										 --@@ NEW!
-    --@@ NOTE: apptype 0 and 4 are reserved for Vita homebrew
+    if setRetroFlow == 1 and adrLauncher == 1 then
+	psp_table =	 Read_Rom_Dir(2, {".iso", ".cso"})
+	psx_table =	 Read_Rom_Dir(3, {".cue", ".img", ".mdf", ".pbp", ".toc", ".cbn", ".m3u", ".ccd", ".chd"})
+    end
+    -- NOTE: apptype 0 and 4 are reserved for Vita homebrew
 
-    local real_app_list = {}							 --@@ NEW! Now localized here since rolling cache has to run twice
---@@local real_app_list = System.listDirectory(System.currentDirectory())	 --@@ MOVED
-    local cover_path = ""							 --@@ NEW! Now localized here since rolling cache has to run twice
-    local cover_list = {}							 --@@ NEW! Now localized here since rolling cache has to run twice
-    local custom_path = ""							 --@@ NEW! Now localized here since rolling cache has to run twice
-    local custom_path_id = ""							 --@@ NEW! Now localized here since rolling cache has to run twice
+    local real_app_list = {}
+    local cover_path = ""
+    local cover_list = {}
+    local custom_path = ""
+    local custom_path_id = ""
 
     local newAppsMsg = ""
 
@@ -1557,9 +1549,9 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
     local cover_dir_psp = switch_generator(covers_psp)
     local cover_dir_psx = switch_generator(covers_psx)
 
-    function instant_cover_finder(file)						 --@@ NEW! Moved this code chunk here now and function-ified it since rolling cache has to run twice @@ ...should this function be local?
+    function instant_cover_finder(file)				 -- should this function be local?
 	cover_path = CoverDirectoryLookup(file.app_type)
-	if cover_path == covers_psx then					 --@@ PSX is now highest priority because if Adrenaline Launcher is enabled, PSP will 99% not use this function. They'll get covers from Read_Rom_Dir()
+	if cover_path == covers_psx then			 -- PSX is top priority because if Adrenaline Launcher is enabled, PSP will 99% not use this function. They'll get covers from Read_Rom_Dir()
 	    cover_list = cover_dir_psx
 	elseif cover_path == covers_psp then
 	    cover_list = cover_dir_psp
@@ -1570,13 +1562,13 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 	if cover_list[custom_path] then
 	    return cover_path .. custom_path
 	elseif cover_list[file.apptitle .. ".png"] then
-	    return cover_path .. file.apptitle .. ".png"			 --@@ Rare
+	    return cover_path .. file.apptitle .. ".png"	 -- Rare
 	else
 	    return "ur0:/appmeta/" .. file.name .. "/icon0.png"
 	end
     end
 
-    --@@ NEW! START ADRENALINE LAUNCHER CACHE ROLL. This whole section is new. What used to be here is right below it.
+    -- START ADRENALINE LAUNCHER CACHE ROLL
     if not cur_quick_dir["adrtitlecache.dat"] then
 	real_app_list = System.listDirectory(pspemu_dir .. "/PSP/GAME")
     elseif setRetroFlow == 1 and adrLauncher == 1 then
@@ -1590,15 +1582,14 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
                 file = {}
                 file.directory = toboolean(app[1])
                 file.size = tonumber(app[2])
-                --file.icon = tonumber(app[3])			  --@@ Uses imgCoverTmp instead.
-                --file.icon_path = tostring(app[4])		  --@@ Uses instant cover finder instead.
+                --file.icon = tonumber(app[3])			  -- Uses imgCoverTmp instead.
+                --file.icon_path = tostring(app[4])		  -- Uses instant cover finder instead.
                 file.apptitle = tostring(app[5])
                 file.name = tostring(app[6])
                 file.app_type = tonumber(app[7])
 
 		file.launch_type = 1
 
-		--@@ NEW! Moved a bunch of code from the instant cover finder into a disposable function
 		file.icon_path = instant_cover_finder(file)
 
 		if quick_app_list[file.name] then
@@ -1618,16 +1609,16 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 			table.insert(homebrews_table, file)
 		    end
 		    table.insert(files_table, file)
-		    if file.apptitle ~= "-" then		 --@@ BAD CODE
+		    if file.apptitle ~= "-" then		 -- BAD CODE
 			real_app_list[(quick_app_list[file.name])].name = nil
-		    end						 --@@ BAD CODE
+		    end						 -- BAD CODE
 		else
 		    newAppsMsg = newAppsMsg .. "-" .. file.name .. "\n"
 		end
 	    end		
 	end
     else
-	real_app_list = {}					 --@@ Meh code
+	real_app_list = {}					 -- Meh code
     end
 
     for _, v in pairs(real_app_list) do
@@ -1636,7 +1627,7 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 		
 	    if oneLoopTimer then
 		inp = io.open(pspemu_dir .. "/PSP/GAME/" .. v.name .. "/EBOOT.PBP", "rb")
-	    else	 --@@ Only slow-scan (which says exactly what went wrong if it fails) when toggling Adrenaline Launcher, not during startup. People with issues can then delete their config.dat for an easy fix.
+	    else	 -- Only slow-scan (which says exactly what went wrong if it fails) when toggling Adrenaline Launcher, not during startup. People with issues can then delete their config.dat for an easy fix.
 		inp = assert(io.open(pspemu_dir .. "/PSP/GAME/" .. v.name .. "/EBOOT.PBP", "rb"), "Failed to open " .. pspemu_dir .. "/PSP/GAME/" .. v.name .. "/EBOOT.PBP")
 	    end
 	    data = inp:read(1000)
@@ -1645,12 +1636,12 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 	    v.launch_type = 1
 	    v.icon_path = "app0:/DATA/noimg.png"
 	    if string.find(data,"TITLE%c%c%c%c%c%c%cME") == 289 then
-		v.apptitle = string.sub(data, 857, -1):match("([^%c]+)") --@@ Wizardry v2
-		v.app_type = 3						 --@@ PS1 games made with PSX2PSP
+		v.apptitle = string.sub(data, 857, -1):match("([^%c]+)") -- Wizardry v2
+		v.app_type = 3						 -- PS1 games made with PSX2PSP
 		v.icon_path = instant_cover_finder(v)
 		if v.icon_path:match("/icon0.png") then
 		    if showView==5 or showView==6 or showView==7 then
-			v.icon_path = "app0:/DATA/icon_psx.png"		 --@@ special square placeholder icons for SwitchView.
+			v.icon_path = "app0:/DATA/icon_psx.png"		 -- special square placeholder icons for SwitchView.
 		    else
 			v.icon_path = "app0:/DATA/missing_cover_psx.png"
 		    end
@@ -1658,10 +1649,10 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 		table.insert(files_table, v)
 		table.insert(psx_table, v)
 	    elseif v.directory == true then
-		v.apptitle = "-"					 --@@ Ones named "-" get re-scanned.
-		v.app_type = 2						 --@@ PSP games/homebrews (eboot.pbp)
+		v.apptitle = "-"					 -- Ones named "-" get re-scanned.
+		v.app_type = 2						 -- PSP games/homebrews (eboot.pbp)
 		v.icon_path = "ur0:/appmeta/" .. v.name .. "/icon0.png"
-		--@@table.insert(psp_table, v)				 --@@ Useless since this even existing causes a restart.
+		--table.insert(psp_table, v)				 -- Useless since this even existing causes a restart.
 		table.insert(folders_table, v)
 		newAppsMsg = newAppsMsg .. "+" .. v.name .. "\n"
 	    end
@@ -1669,7 +1660,7 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
     end
 
     if newAppsMsg ~= "" and not string.find(newAppsMsg,"+") then
-	CacheTitleTable("adrtitlecache.dat")	 --@@ Only removing apps from cache.
+	CacheTitleTable("adrtitlecache.dat")	 -- Only removing apps from cache.
     elseif cache_injection or newAppsMsg ~= "" then
 	local file_over = System.openFile(cur_dir .. "/overrides.dat", FREAD)
 	local filesize = System.sizeFile(file_over)
@@ -1681,7 +1672,7 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 	end
 
 	CacheTitleTable("adrtitlecache.dat")
-	System.launchEboot("app0:/script.bin")	 --@@ Simply reads script.lua
+	System.launchEboot("app0:/script.bin")	 -- Simply reads script.lua
 	--System.setMessage(newAppsMsg, false, BUTTON_OK)
     elseif not cur_quick_dir["adrtitlecache.dat"] then
 	local file_over = System.openFile(cur_dir .. "/adrtitlecache.dat", FCREATE)
@@ -1689,21 +1680,16 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 	System.writeFile(file_over, " ", 1)
 	System.closeFile(file_over)
     end
-    --@@ END ADRENALINE LAUNCHER CACHE ROLL
+    -- END ADRENALINE LAUNCHER CACHE ROLL
 
-    --@@ START BUBBLES CACHE ROLL
+    -- START BUBBLES CACHE ROLL
     folders_table = {}
     real_app_list = System.listDirectory(working_dir)
     newAppsMsg = ""
 
     if cur_quick_dir["apptitlecache.dat"] then			 -- Faster than System.doesFileExist(...)
-    --@@local quick_app_list = {}				 --@@ MOVED
-    --@@local cover_path = ""					 --@@ MOVED
-    --@@local cover_list = {}					 --@@ MOVED
-    --@@local custom_path = ""					 --@@ MOVED
-    --@@local custom_path_id = ""				 --@@ Removed
 
-	make_quick_app_list(real_app_list)			 --@@ NEW! Will get removed in a future version
+	make_quick_app_list(real_app_list)			 -- Will get removed in a future version
 	for line in io.lines(cur_dir .. "/apptitlecache.dat") do
 	    if not (line == "" or line == " " or line == "\n") then
                 -- {directory,size,icon,icon_path,apptitle,name,app_type}
@@ -1719,16 +1705,15 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 
 		file.launch_type = 0
 
-		--@@ NEW! Moved a bunch of code from the instant cover finder into a disposable function
 		file.icon_path = instant_cover_finder(file)
 
 		if quick_app_list[file.name] then
 		    if real_app_list[(quick_app_list[file.name])].directory == false then
 			-- do nothing - entry is a duplicate
-		    else					 --@@ NEW!
+		    else
 			table.insert(folders_table, file)
-			if setRetroFlow ~= 1 or adrLauncher ~= 1 or not string.find(file.name, "PSPEMU%d%d%d") then --@@ NEW!
-			    table.insert(files_table, file)	 --@@ NEW! This is now nestled inside the above if statement instead of in each individual app type because Adrenaline Launcher is now overrideable in this public iteration of it.
+			if setRetroFlow ~= 1 or adrLauncher ~= 1 or not string.find(file.name, "PSPEMU%d%d%d") then
+			    table.insert(files_table, file)
 			    if file.app_type == 1 then
 				table.insert(games_table, file) 
 			    elseif file.app_type == 2 then
@@ -1738,7 +1723,7 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 			    else
 				table.insert(homebrews_table, file)
 			    end
-			end					 --@@ NEW!
+			end
 		    end
 		    real_app_list[(quick_app_list[file.name])].directory = false
 		else
@@ -1769,46 +1754,32 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 	ovrrd_str = System.readFile(file_over, filesize)
 	System.closeFile(file_over)
 
---@@ NEW! psx.lua and psx.dat no longer necessary.
---@@	-- psx.lua taken from Retroflow 3.4 and completely repurposed
---@@	local file_over = System.openFile("app0:addons/psx.lua", FREAD)
---@@	local filesize = System.sizeFile(file_over)
---@@	psxdb = System.readFile(file_over, filesize)
---@@	System.closeFile(file_over)
-
 	for _, file in pairs(real_app_list) do
 	    if (#real_app_list > 5) and (#folders_table ~= 0) then
 		update_loading_screen_progress(#folders_table / total_apps)
 	    end
 	    newAppsMsg = newAppsMsg .. "+" .. file.name .. "\n"
-	    custom_path, custom_path_id, app_type = nil, nil, nil	 --@@ No longer local
+	    custom_path, custom_path_id, app_type = nil, nil, nil	 -- No longer local
 	    info = System.extractSfo(working_dir .. "/" .. file.name .. "/sce_sys/param.sfo")
 	    app_short_title = sanitize(info.short_title)
 	    file.launch_type = 0
 	    if string.match(file.name, "PCS") and not string.match(file.name, "PCSI") then
 		-- PSVita Games
 		file.app_type = 1
-	--@@elseif System.doesFileExist(working_dir .. "/" .. file.name .. "/data/boot.bin") and not System.doesFileExist("ux0:pspemu/PSP/GAME/" .. file.name .. "/EBOOT.PBP") then
-	    elseif System.doesFileExist(working_dir .. "/" .. file.name .. "/data/boot.bin") then --@@and not System.doesFileExist("ux0:pspemu/PSP/GAME/" .. file.name .. "/EBOOT.PBP") then
---@@		pspemu_translate_tmp = readBin(working_dir .. "/" .. file.name .. "/data/boot.bin", "false")	 -- example: "SLUS00453"
---@@		if pspemu_translate_tmp and pspemu_translate_tmp ~= "-" and string.match(psxdb, pspemu_translate_tmp) then
-		--@@ NEW! Super optimized this.
-		if readBin(working_dir .. "/" .. file.name .. "/data/boot.bin", "false") == "PSX" then --@@ NEW!
+	    elseif System.doesFileExist(working_dir .. "/" .. file.name .. "/data/boot.bin") then
+		if readBin(working_dir .. "/" .. file.name .. "/data/boot.bin", "false") == "PSX" then
 		    -- PSX
 		    file.app_type = 3
 		else
 		    -- PSP
 		    file.app_type = 2
 		end
---@@	    elseif System.doesFileExist(working_dir .. "/" .. file.name .. "/data/boot.bin") and System.doesFileExist("ux0:pspemu/PSP/GAME/" .. file.name .. "/EBOOT.PBP") then
---@@		-- PSX Games
---@@		file.app_type = 3
 	    else
 		-- Homebrews.
 		file.app_type=0
 	    end
 	    -- Respec applies overrides, adds item to table, and sets icon_path. Also used for triangle menu overrides.
-	    file.app_type, file.icon_path = Respec_Entry(file) --@@, pspemu_translate_tmp)
+	    file.app_type, file.icon_path = Respec_Entry(file)
 
 	    --file.icon = imgCoverTmp		--add blank icon to all. Not necessary anymore
         
@@ -1830,21 +1801,14 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 
     if newAppsMsg ~= "" then	 -- Always rewrites applist/cache when a title is added/removed.
 	table.sort(folders_table, function(a, b) return (a.apptitle:lower() < b.apptitle:lower()) end)
-    --@@CacheTitleTable()
-	CacheTitleTable("apptitlecache.dat")		 --@@ NEW!
+	CacheTitleTable("apptitlecache.dat")
 	WriteAppList()
       --System.setMessage(newAppsMsg, false, BUTTON_OK)
     end
     -- END AUTOMATIC CACHE ADDER
 
-    newAppsMsg = ""					 --@@ Not necessary
-    real_app_list = {}					 --@@ Not necessary
---@@if setRetroFlow==1 then
---@@	files_table = TableConcat(folders_table, files_table)
---@@	folders_table = {}
---@@else
---@@	files_table = folders_table	 -- folders_table is for everything that needs cached. Without it, adding Adrenaline Launcher will be much harder.
---@@end
+    newAppsMsg = ""
+    real_app_list = {}
     table.sort(files_table, function(a, b) return (a.apptitle:lower() < b.apptitle:lower()) end)
 
     applistReadTime = Timer.getTime(applistReadTimer)
@@ -1888,13 +1852,9 @@ function LoadAppTitleTables(cache_injection)	 --@@ NEW! Can now cache inject to 
 end
 
 -- Sects: [1]=directory, [2]=size, [3]=icon, [4]=icon_path, [5]=apptitle, [6]=name, [7]=app_type
-function UpdateCacheSect(app_id, working_sect, new_path, output_file)	 --@@ NEW! You can now select output file
---@@    if not cur_quick_dir[output_file] then				 --@@ Removed. I want it to crash
---@@	return
---@@    end
+function UpdateCacheSect(app_id, working_sect, new_path, output_file)	 -- You can now select output file
 
---@@local inf = assert(io.open(cur_dir .. "/apptitlecache.dat", "r"), "Failed to open apptitlecache.dat")
-    local inf = assert(io.open(cur_dir .. "/" .. output_file, "r"), "Failed to open " .. output_file)	 --@@ NEW!
+    local inf = assert(io.open(cur_dir .. "/" .. output_file, "r"), "Failed to open " .. output_file)
     local lines = ""
     while(true) do
 	local line = inf:read("*line")
@@ -1909,8 +1869,7 @@ function UpdateCacheSect(app_id, working_sect, new_path, output_file)	 --@@ NEW!
 	end
     end
     inf:close()
---@@file = io.open(cur_dir .. "/apptitlecache.dat", "w")
-    file = io.open(cur_dir .. "/" .. output_file, "w")			 --@@ NEW!
+    file = io.open(cur_dir .. "/" .. output_file, "w")
     file:write(lines)
     file:close()
 end
@@ -1979,23 +1938,30 @@ function GetInfoSelected()
 		end
 	    end
 	else
-	    if (xCatLookup(showCat)[p].launch_type == 1)		 --@@ NEW!
-	    or (xCatLookup(showCat)[p].launch_type == 2) then		 --@@ NEW!
-		if xCatLookup(showCat)[p].directory then		 --@@ NEW!
-		    app_titleid = xCatLookup(showCat)[p].name		 --@@ NEW!
-		    appdir = pspemu_dir .. "/PSP/GAME/" .. app_titleid	 --@@ NEW! @@ example: "ux0:pspemu/PSP/GAME/SLUS00453"
-		    if System.doesDirExist(appdir) then			 --@@ NEW!
-			app_size = getAppSize(appdir)			 --@@ NEW!
-		    end							 --@@ NEW!
-		else							 --@@ NEW!
-		    DISC_ID = readBin(pspemu_dir .. "/ISO/" .. xCatLookup(showCat)[p].name, ".iso") --@@ NEW!
-		    app_size = xCatLookup(showCat)[p].size		 --@@ NEW!
-		end							 --@@ NEW!
+	    if (xCatLookup(showCat)[p].launch_type == 1)		 -- for adr
+	    or (xCatLookup(showCat)[p].launch_type == 2) then
+		if xCatLookup(showCat)[p].directory then
+		    app_titleid = xCatLookup(showCat)[p].name
+		    appdir = pspemu_dir .. "/PSP/GAME/" .. app_titleid	 -- example: "ux0:pspemu/PSP/GAME/SLUS00453"
+		    if System.doesDirExist(appdir) then
+			app_size = getAppSize(appdir)
+		    end
+		else
+		    DISC_ID = readBin(pspemu_dir .. "/ISO/" .. xCatLookup(showCat)[p].name, ".iso")
+		    app_size = xCatLookup(showCat)[p].size
+		end
 	    elseif xCatLookup(showCat)[p].directory then
 		DISC_ID = xCatLookup(showCat)[p].gameid			 -- For ScummVM (Example: "Freddi2"). About here is also where you'd put the PSP ID scanner
 		app_titleid = xCatLookup(showCat)[p].name
 		appdir = working_dir .. "/" .. app_titleid		 --example: "ux0:pspemu/PSP/GAME/SLUS00453"
 		app_size = getAppSize(appdir)
+--@@	    elseif xCatLookup(showCat)[p].launch_type == 8 then		 --@@ new but unused (DS)
+--@@		app_size = xCatLookup(showCat)[p].size			 --@@ new but unused (DS)
+--@@		if app_size > 12 then					 --@@ new but unused (DS)
+--@@		    local inp = assert(io.open(xRomDirLookup(8) .. "/" .. xCatLookup(showCat)[p].name, "rb"), "Failed to open .nds file") --@@ new but unused (DS)
+--@@		    app_titleid = inp:read(12):gsub("%c", ".")		 --@@ new but unused (DS)
+--@@		    inp:close()						 --@@ new but unused (DS)
+--@@		end							 --@@ new but unused (DS)
 	    else
 		app_size = xCatLookup(showCat)[p].size
 	    end
@@ -2098,18 +2064,17 @@ function OverrideCategory()
 	file:close()
 
 	-- Respec applies overrides, adds item to table, and set icon_path. Also used during startup scan.
-	xCatLookup(showCat)[p].app_type, xCatLookup(showCat)[p].icon_path = Respec_Entry(xCatLookup(showCat)[p]) --@@, nil)
+	xCatLookup(showCat)[p].app_type, xCatLookup(showCat)[p].icon_path = Respec_Entry(xCatLookup(showCat)[p])
 	ovrrd_str = ""
 
 	-- force icon change
 	xCatLookup(showCat)[p].ricon = Graphics.loadImage(xCatLookup(showCat)[p].icon_path)
 
-    --@@UpdateCacheSect(app_titleid, 7, tmpappcat)
-	if xCatLookup(showCat)[p].launch_type == 0 then				 --@@ NEW!
-	    UpdateCacheSect(app_titleid, 7, tmpappcat, "apptitlecache.dat")	 --@@ NEW!
-	else --@@ elseif xCatLookup(showCat)[p].launch_type == 1 then		 --@@ NEW!
-	    UpdateCacheSect(app_titleid, 7, tmpappcat, "adrtitlecache.dat")	 --@@ NEW!
-	end									 --@@ NEW!
+	if xCatLookup(showCat)[p].launch_type == 0 then
+	    UpdateCacheSect(app_titleid, 7, tmpappcat, "apptitlecache.dat")
+	else
+	    UpdateCacheSect(app_titleid, 7, tmpappcat, "adrtitlecache.dat")
+	end
 
 	-- Tidy up: remove game from old table, sort target table.
 	for k, v in pairs(xCatLookup(appt_hotfix(apptype))) do
@@ -2123,7 +2088,7 @@ function OverrideCategory()
     end
 end
 
-function rename_this_app()	 --@@NEW! Moved here and now function-ified.
+function rename_this_app()
     local running = false
     status = Keyboard.getState()
     if status ~= RUNNING then
@@ -2140,7 +2105,7 @@ function rename_this_app()	 --@@NEW! Moved here and now function-ified.
 	    or (result_text == "-") then						 -- Prevents an annoying glitch
 		System.setMessage("invalid title", false, BUTTON_OK)
 		return
-	    elseif xCatLookup(showCat)[p].launch_type == 0 then		 --@@ Bubbles
+	    elseif xCatLookup(showCat)[p].launch_type == 0 then		 -- Bubbles
 		if result_text:len() == 0 then
 		    result_text = sanitize(app_short_title)
 		end
@@ -2149,7 +2114,7 @@ function rename_this_app()	 --@@NEW! Moved here and now function-ified.
 		targetX = targetX - 0.5
 		GetNameSelected()
 		close_triangle_preview()
-	    elseif xCatLookup(showCat)[p].launch_type == 1 then		 --@@ (Adr launcher) PSP homebrew and PS1
+	    elseif xCatLookup(showCat)[p].launch_type == 1 then		 -- (Adr launcher) PSP homebrew and PS1
 		if result_text:len() == 0 then
 		    result_text = reset_eboot_apptitle()
 		end
@@ -2158,9 +2123,9 @@ function rename_this_app()	 --@@NEW! Moved here and now function-ified.
 		if result_text == "-" then
 		    UpdateCacheSect(app_titleid, 5, "-", "adrtitlecache.dat")
 		    System.launchEboot("app0:/script.bin")
-		elseif not xCatLookup(showCat)[p].icon then		 --@@ PS1 game that was loaded without cache.
+		elseif not xCatLookup(showCat)[p].icon then		 -- PS1 game that was loaded without cache.
 		    xCatLookup(showCat)[p].icon = -2121791736
-		    LoadAppTitleTables({(xCatLookup(showCat)[p])})	 --@@ a table containing only this app (which is also a table so () is required)
+		    LoadAppTitleTables({(xCatLookup(showCat)[p])})	 -- a table containing only this app (which is also a table so () is required)
 		else
 		    UpdateCacheSect(app_titleid, 5, result_text, "adrtitlecache.dat")
 		end
@@ -2185,14 +2150,15 @@ function DownloadCover(entry)
     launch_mode = entry.launch_type
 
     -- ID reader for PSP/PS1 games.
---@@if inPreview==false and launch_mode==0 and (apptype==2 or apptype==3) then
-    if inPreview==false then						   --@@ NEW! Allows binary scanner outside triangle menu.
-	DISC_ID = false							   --@@ NEW!
-	if launch_mode==2 and apptype==2 and entry.directory==false then   --@@ NEW!
-	    DISC_ID = readBin(pspemu_dir .. "/ISO/" .. entry.name, ".iso") --@@ NEW!
-	elseif launch_mode==0 and (apptype==2 or apptype==3) then	   --@@ NEW!
-	    DISC_ID =  readBin(working_dir .. "/" .. entry.name .. "/data/boot.bin", "true") -- not new lol
-	end								   --@@ NEW!
+    if entry.name == "RETROLNCR" then	 --@@ NEW!
+	DISC_ID = false			 --@@ NEW!
+    elseif inPreview==false then	 -- Allows binary scanner outside triangle menu.
+	DISC_ID = false
+	if launch_mode==2 and apptype==2 and entry.directory==false then
+	    DISC_ID = readBin(pspemu_dir .. "/ISO/" .. entry.name, ".iso")
+	elseif launch_mode==0 and (apptype==2 or apptype==3) then
+	    DISC_ID =  readBin(working_dir .. "/" .. entry.name .. "/data/boot.bin", "true")
+	end
     end
 
     downloadable_file =
@@ -2255,7 +2221,7 @@ function DownloadCover(entry)
     output_folder = CoverDirectoryLookup(apptype)			 -- Ex:  "ux0:/data/HexFlow/COVERS/PSVITA/"
     System.createDirectory(output_folder)				 -- Prevents Nintendo DS cover download crash in experimental builds.
 
-    --@@if apptype == 25 and entry.gameid then				 --@@ new but unused. The one below an cause a crash, but if it does crash, I would wanna know. It means there's a serious issue.
+    --if apptype == 25 and entry.gameid then				 -- The one below an cause a crash, but if it does crash, I would wanna know. It means there's a serious issue.
     if apptype == 25 then						 -- ScummVM
 	custom_path = entry.gameid .. ".png"
     end
@@ -2287,7 +2253,9 @@ function DownloadSnap(entry)
     launch_mode = entry.launch_type
 
     -- ID reader for PSP/PS1 games.
-    if inPreview==false and launch_mode==0 and (apptype==2 or apptype==3) then
+    if entry.name == "RETROLNCR" then	 --@@ NEW!
+	DISC_ID = false			 --@@ NEW!
+    elseif inPreview==false and launch_mode==0 and (apptype==2 or apptype==3) then
 	DISC_ID =  readBin(working_dir .. "/" .. entry.name .. "/data/boot.bin", "true")
     end
 
@@ -2352,7 +2320,7 @@ function DownloadSnap(entry)
 	output_folder = "ux0:data/RetroFlow/BACKGROUNDS/Sony - PlayStation Portable/"
     elseif apptype == 3 then
 	output_folder = "ux0:data/RetroFlow/BACKGROUNDS/Sony - PlayStation/"
-    --@@elseif apptype == 25 and entry.gameid then			 --@@ new but unused. The one below an cause a crash, but if it does crash, I would wanna know. It means there's a serious issue.
+    --elseif apptype == 25 and entry.gameid then			 -- The one below an cause a crash, but if it does crash, I would wanna know. It means there's a serious issue.
     elseif apptype == 25 then
 	output_folder = "ux0:/data/RetroFlow/BACKGROUNDS/ScummVM/"	 -- Not important
 	custom_path = entry.gameid .. ".png"				 -- Important
@@ -2477,7 +2445,7 @@ local function DrawCover(x, y, text, icon, sel, apptype, reflections)
 	space = 1.5
 	zoom = -0.6
 	extray = -0.3
-        camX = 1			 --@@ To use RetroFlow's 'planebg.obj', remove this line and for the next 4 extrax's... subtract 1 on them
+        camX = 1			 -- To use RetroFlow's 'planebg.obj', remove this line and for the next 4 extrax's... subtract 1 on them
 	if x > space then
 	    rot = -0.5
 	    extraz = x * 0.833		 --simplified abs_side_factor + x
@@ -2998,12 +2966,14 @@ while true do
 	    if (showView == 1)					 -- n64_fix
 	    and (l == master_index)				 -- n64_fix
 	    and (file.app_type == 5 or file.app_type == 6) then	 -- n64_fix
-		base_x = base_x + space				 -- n64_fix
+		--@@base_x = base_x + space
 		n64_x_bonus = n64_x_bonus - 0.35		 -- n64_fix
-            elseif l >= master_index then			 -- Note: >= @@ Used to be just "if" not "elseif"
+	    --@@elseif l >= master_index then
+	    elseif l > master_index then			 --@@ NEW!
                 base_x = base_x + space
 	    elseif (showView == 1)				 -- n64 fix
-	    and (l <= master_index)				 -- n64 fix
+	    --@@and (l <= master_index)
+	    and (l < master_index)				 --@@ NEW! n64 fix
 	    and (file.app_type == 5 or file.app_type == 6) then	 -- n64_fix
 		base_x = base_x - n64_fatness			 -- n64_fix +0.8 base x bonus after an n64
             end
@@ -3030,7 +3000,8 @@ while true do
                         Index = "ricon"
                     })
                 end
-		DrawCover(space*(l-curTotal-1) + targetX + n64_x_bonus, -0.6, file.apptitle, file.ricon or imgCoverTmp, l, file.app_type, setReflections)--draw visible covers only @@ n64_fix
+	    --@@DrawCover(space*(l-curTotal-1) + targetX + n64_x_bonus, -0.6, file.apptitle, file.ricon or imgCoverTmp, l, file.app_type, setReflections)
+		DrawCover(space*(l-curTotal) + targetX + n64_x_bonus, -0.6, file.apptitle, file.ricon or imgCoverTmp, l, file.app_type, setReflections)--@@ NEW! draw visible covers only @@ n64_fix
             else
 		if skipRow == false and showView == 6 then
 		    skipRow = true
@@ -3094,9 +3065,9 @@ while true do
 	if Network.isWifiEnabled() then
             Graphics.drawImage(798, 35, imgWifi)		 -- wifi icon
 	else
-	    Graphics.drawImage(798, 35, imgWifi, fourtyalpha)	 --@@ NEW! wifi icon: 40% opacity
-	    Graphics.drawLine(797, 817, 34, 54, white)		 --@@ NEW!
-	    Graphics.drawLine(798, 818, 34, 54, white)		 --@@ NEW!
+	    Graphics.drawImage(798, 35, imgWifi, fourtyalpha)	 -- wifi icon: 40% opacity
+	    --@@Graphics.drawLine(797, 817, 34, 54, white)
+	    --@@Graphics.drawLine(798, 818, 34, 54, white)
 	end
 	-- END HEADER
 
@@ -3292,16 +3263,12 @@ while true do
 	DrawCover(prevX, -1.0, file.name, file.ricon or imgCoverTmp, p, file.app_type, 0)
 
 	Font.print(fnt22, 50, 190, txtname, white)-- app name
-    --@@if DISC_ID and DISC_ID ~= app_titleid then
-    --@@    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. " (" .. DISC_ID .. ")\nVersion: " .. app_version .. "\n" .. app_size_text, white)-- Draw info (PS1)
-    --@@else
-    --@@    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. "\nVersion: " .. app_version .. "\n" .. app_size_text, white)-- Draw info (not PS1)
-	if (not DISC_ID) or (DISC_ID == app_titleid) then	 --@@ NEW! Non-PS1... or PS1 ID matches Adr Bubble ID.
-	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. "\nVersion: " .. app_version .. "\n" .. app_size_text, white)		     --@@ NEW! Draw info
-	elseif app_titleid == "000000000" then			 --@@ NEW! PS1 that is NOT an Adrenaline Manager Bubble.
-	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. DISC_ID .. "\nVersion: " .. app_version .. "\n" .. app_size_text, white)			     --@@ NEW! Draw info
-	else							 --@@ NEW! Show PS1 ID and Adrenaline Manager Bubble ID.
-	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. " (" .. DISC_ID .. ")\nVersion: " .. app_version .. "\n" .. app_size_text, white)--@@ NEW! Draw info
+	if (not DISC_ID) or (DISC_ID == app_titleid) then	 -- Non-PS1... or PS1 ID matches Adr Bubble ID.
+	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. "\nVersion: " .. app_version .. "\n" .. app_size_text, white)
+	elseif app_titleid == "000000000" then			 -- PS1 that is NOT an Adrenaline Manager Bubble.
+	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. DISC_ID .. "\nVersion: " .. app_version .. "\n" .. app_size_text, white)
+	else							 -- Show PS1 ID and Adrenaline Manager Bubble ID.
+	    Font.print(fnt22, 50, 240, tmpapptype .. "\nApp ID: " .. app_titleid .. " (" .. DISC_ID .. ")\nVersion: " .. app_version .. "\n" .. app_size_text, white)
 	end
 
 	if tmpappcat==1 then
@@ -3316,8 +3283,8 @@ while true do
 	    tmpcatText = lang_lines[121] -- Default
 	end
 
-	if (xCatLookup(showCat)[p].launch_type == 0)		 --@@ Bubbles
-	or (xCatLookup(showCat)[p].launch_type == 1) then	 --@@ (Adr launcher) PSP homebrew and PS1
+	if (xCatLookup(showCat)[p].launch_type == 0)		 -- Bubbles
+	or (xCatLookup(showCat)[p].launch_type == 1) then	 -- (Adr launcher) PSP homebrew and PS1
 	    menuItems = 2
 	    Graphics.fillRect(24, 470, 350 + (menuY * 40), 390 + (menuY * 40), themeCol)-- selection
 	    Font.print(fnt22, 50, 352, lang_lines[20], white)				 -- Download Cover
@@ -3350,7 +3317,7 @@ while true do
 			    end
 			end
 		    elseif menuY == 2 then	 -- Renamer option
-			rename_this_app()	 --@@ NEW! Now stuffed into a function
+			rename_this_app()
                     end
 		elseif (Controls.check(pad, SCE_CTRL_UP)) and not (Controls.check(oldpad, SCE_CTRL_UP)) then
 		    if menuY > 0 then
@@ -3457,8 +3424,8 @@ while true do
 	Graphics.fillRect(60, 900, 24, 488, darkalpha)
 	Graphics.drawImage(84, 33, imgCog)
 	Font.print(fnt22, 84 + 36, 34, lang_lines[6], white)--SETTINGS
-	if menuY == -1 then				  --@@ NEW!
-	    Graphics.fillRect(620, 900, 29, 64, themeCol) --@@ NEW! selection
+	if menuY == -1 then
+	    Graphics.fillRect(620, 900, 29, 64, themeCol) -- selection
 	elseif menuY < 5 then
 	    Graphics.fillRect(60, 900, 77 + (menuY * 34), 112 + (menuY * 34), themeCol)-- selection
 	elseif menuY == 11 then
@@ -3474,10 +3441,10 @@ while true do
         Graphics.drawLine(65, 895, 248, 248, white)
         Graphics.drawLine(65, 895, 282, 282, white)
         Graphics.drawLine(60, 900, 452, 452, white)
-    --@@Font.print(fnt22, math.min(484 + toggle2X + 275, 876 - Font.getTextWidth(fnt22,"English") - 38), 34, "English\n" .. tostring(484 + toggle2X + 275) .. "\n" .. tostring(876 - Font.getTextWidth(fnt22,"English") - 38), white)--SETTINGS
-	Font.print(fnt22, 876 - Font.getTextWidth(fnt22,lang_lines[127]) - 43, 34, lang_lines[127], white) --@@ NEW!
-	Graphics.fillRect(876 - 30, 876, 37, 57, black)	 --@@ NEW!
-	Graphics.drawImage(876 - 30, 37, imgFlag)	 --@@ NEW!
+     --Font.print(fnt22, math.min(484 + toggle2X + 275, 876 - Font.getTextWidth(fnt22,"English") - 38), 34, "English\n" .. tostring(484 + toggle2X + 275) .. "\n" .. tostring(876 - Font.getTextWidth(fnt22,"English") - 38), white)--SETTINGS
+	Font.print(fnt22, 876 - Font.getTextWidth(fnt22,lang_lines[127]) - 43, 34, lang_lines[127], white)
+	Graphics.fillRect(876 - 30, 876, 37, 57, black)
+	Graphics.drawImage(876 - 30, 37, imgFlag)
         
         menuItems = 11
         
@@ -3556,17 +3523,14 @@ while true do
 	end
         Font.print(fnt22, 84 + 260, 79 + 102, BGroundText, white)
 
-    --@@Font.print(fnt22, 84, 79 + 136, lang_lines[21] .. ": ", white)--Language
-    --@@Graphics.drawImage(84 + 260 - 40, 79 + 136 + 3, imgFlag)
-    --@@Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[127], white)--English/Japanese/etc
-	if setRetroFlow == 1 then	 --@@ NEW! Adrenaline Launcher: ON/OFF
-	    Font.print(fnt22, 84, 79 + 136, "Adrenaline Launcher : ", white)
+	if setRetroFlow == 1 then
+	    Font.print(fnt22, 84, 79 + 136, "Adrenaline Launcher : ", white)--Adrenaline Launcher
 	    if getAdr == 1 then
 		if adrenaline_brackets == true then
-		--@@Font.print(fnt22, 84 + 260, 79 + 136, "<  " .. lang_lines[22] .. "- ux0:/pspemu/  >", white)--ON - ux0:/pspemu/
+		    --Font.print(fnt22, 84 + 260, 79 + 136, "<  " .. lang_lines[22] .. "- ux0:/pspemu/  >", white)--ON - ux0:/pspemu/
 		    Font.print(fnt20, 84 + 260, 79 + 136 + 1, "<  " .. lang_lines[22] .. "- ux0:/pspemu/PSP/ - ( " .. total_pspemu .. " )  >", white)--ON - ux0:/pspemu/PSP/
 		else
-		--@@Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[22] .. "- ux0:/pspemu/", white)--ON - ux0:/pspemu/
+		    --Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[22] .. "- ux0:/pspemu/", white)--ON - ux0:/pspemu/
 		    Font.print(fnt20, 84 + 260, 79 + 136 + 1, lang_lines[22] .. "- ux0:/pspemu/PSP/ - ( " .. total_pspemu .. " )", white)--ON - ux0:/pspemu/PSP/
 		end
 	    elseif getAdr == 2 then
@@ -3576,8 +3540,8 @@ while true do
 		    Font.print(fnt20, 84 + 260, 79 + 136 + 1, lang_lines[22] .. "- uma0:/pspemu/PSP/ - ( " .. total_pspemu .. " )", white)--ON - uma0:/pspemu/PSP/
 		end
 	    else
-	    --@@Font.print(fnt22, 84 + 260, 79 + 136, "<  " .. lang_lines[23] .. "- PSP/PS1 with bubbles only  >", white)--OFF
-	    --@@Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[23] .. "- PSP/PS1 with bubbles only", white)--OFF - PSP/PS1 with bubbles only
+		--Font.print(fnt22, 84 + 260, 79 + 136, "<  " .. lang_lines[23] .. "- PSP/PS1 with bubbles only  >", white)--OFF
+		--Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[23] .. "- PSP/PS1 with bubbles only", white)--OFF - PSP/PS1 with bubbles only
 		if adrenaline_brackets == true then
 		    Font.print(fnt22, 84 + 260, 79 + 136, "<  " .. lang_lines[23] .. "  >", white)--< OFF >
 		else
@@ -3585,7 +3549,7 @@ while true do
 		end
 	    end
 	else
-	    Font.print(fnt22, 84, 79 + 136, "Adrenaline Launcher : ", lightgrey)--@@ NEW! Adrenaline Launcher
+	    Font.print(fnt22, 84, 79 + 136, "Adrenaline Launcher : ", lightgrey)--Adrenaline Launcher
 	    Font.print(fnt22, 84 + 260, 79 + 136, "REQ: " .. lang_lines[96] .. " " .. lang_lines[22], white)--REQ: RetroFlow ON
 	end
 
@@ -3753,7 +3717,7 @@ while true do
 			background_brackets = false
 		    end
 		    ApplyBackground(setBackground)
-                elseif menuY == 4 then	 --@@ NEW! Adrenaline Launcher
+                elseif menuY == 4 then	 -- Adrenaline Launcher
 		    if setRetroFlow ~= 1 then
 			local running = false
 			status = System.getMessageState()
@@ -3954,7 +3918,7 @@ while true do
 		    menuX = 0
                     menuY = menuY - 1
 		elseif menuY == 0 and Controls.check(pad, SCE_CTRL_RIGHT) then
-		    menuY = -1	 --@@ Cheap code to access changing language temporarily
+		    menuY = -1	 -- Cheap code to access changing language temporarily
 		elseif menuY == -1 then
 		    menuY = menuItems
 		    menuX = 2
@@ -3972,7 +3936,7 @@ while true do
 			close_utility_menu()
 		    end
 		elseif menuY == menuItems and menuX == 2 then
-		    menuY = -1	 --@@ Cheap code to access changing language temporarily
+		    menuY = -1	 -- Cheap code to access changing language temporarily
 		elseif menuY == 10 and menuX == 2 then	 -- When moving to start menu rows with MORE columns, round "menuX" DOWN.
 		    menuY = menuY + 1
 		    menuX = 1
@@ -4000,8 +3964,6 @@ while true do
 		    background_brackets = true
 		elseif menuY==4 then		 --adrLauncher selection
 		-- [1]=ux0 [2]=uma0
-		--@@if getAdr > 0 then
-		--@@	getAdr = getAdr - 1
 		    if getAdr == 1 then
 			getAdr = 0
 		    elseif getAdr == 2 then
@@ -4032,7 +3994,7 @@ while true do
 		    getCovers = Category_Plus(getCovers+1)
 		elseif menuY==3 then				 --Background selection
 		-- [1]=Custom, [2]=Citylights, [3]=Aurora, [4]=Crystal, [5]=Wood, [6]=Dark, [7]=Playstation Pattern 1, [8]=Playstation Pattern 2, [9]=Retro.
-		    if getBGround < 9 then	 --@@ NEW! Used to be 8
+		    if getBGround < 9 then
 			getBGround = getBGround + 1
 		    else
 			getBGround = 0
@@ -4040,10 +4002,6 @@ while true do
 		    background_brackets = true
 		elseif menuY==4 then		 --adrLauncher selection
 		-- [1]=ux0 [2]=uma0
-		--@@if getAdr < 2 then
-		--@@	getAdr = getAdr + 1
-		--@@if getAdr > 0 then
-		--@@	getAdr = getAdr - 1
 		    if getAdr == 0 then
 			getAdr = 1
 			total_pspemu = #(System.listDirectory("ux0:/pspemu/PSP/GAME") or {}) + #(System.listDirectory("ux0:/pspemu/ISO") or {})
@@ -4182,13 +4140,13 @@ while true do
 		    romfile = xRomDirLookup(launch_mode) .. "/" .. file.name		 -- ex: "ux0:/data/RetroFlow/ROMS/Nintendo - Game Boy/batman.gb"
 
 		    if apptype and xRomDirLookup(launch_mode) then
-			if launch_mode == 1 then				 --@@ NEW! PSP .eboot
-			    launch_Adrenaline(romfile)				 --@@ NEW!
-			elseif launch_mode == 2 then				 --@@ NEW! PSP .iso
-			    if xCatLookup(showCat)[p].directory then		 --@@ NEW!
-				romfile = romfile:gsub("/ISO/", "/PSP/GAME/", 1) --@@ NEW!
-			    end							 --@@ NEW!
-			    launch_Adrenaline(romfile)				 --@@ NEW!
+			if launch_mode == 1 then				 -- PSP .eboot
+			    launch_Adrenaline(romfile)
+			elseif launch_mode == 2 then				 -- PSP .iso
+			    if xCatLookup(showCat)[p].directory then
+				romfile = romfile:gsub("/ISO/", "/PSP/GAME/", 1)
+			    end
+			    launch_Adrenaline(romfile)
 			elseif launch_mode == 3 then	 --@@ PS1 RetroArch
 			    launch_retroarch(romfile, "app0:/pcsx_rearmed_libretro.self")
 			elseif launch_mode == 5 then	 --@@ N64
@@ -4198,8 +4156,8 @@ while true do
 			elseif launch_mode == 7 then	 --@@ NES
 			    launch_retroarch(romfile, "app0:/quicknes_libretro.self")
 		      --elseif launch_mode ==   then	 --@@ NDS
-		      --    launch_NooDS(romfile)
-			elseif launch_mode == 8 then	 --@@ GBA. @@ launch_NooDS(romfile) can also be used for this.
+		      --    launch_DSVita(romfile)
+			elseif launch_mode == 8 then	 --@@ GBA. @@ NooDS (and maybe DSVita?) can also be used for GBA
 			    launch_retroarch(romfile, "app0:/gpsp_libretro.self")
 			elseif launch_mode == 9 then	 --@@ GBC
 			    launch_retroarch(romfile, "app0:/gambatte_libretro.self")
