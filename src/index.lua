@@ -1,4 +1,4 @@
-﻿-- HexFlow Launcher Custom version 2.8
+﻿-- HexFlow Launcher Custom version 2.8.2
 -- based on VitaHEX's HexFlow Launcher v0.5 + SwitchView UI v0.1.2 + jimbob4000's Retroflow v7.1.0
 -- https://www.patreon.com/vitahex
 -- Want to make your own version? Right-click the vpk and select "Open with... Winrar" and edit the index.lua inside.
@@ -12,7 +12,7 @@ local SCUMMVMTime = 0
 
 dofile("app0:addons/threads.lua")
 local working_dir = "ux0:/app"
-local appversion = "2.8"
+local appversion = "2.8.2"
 function System.currentDirectory(dir)
     if dir == nil then
         return working_dir --"ux0:/app"
@@ -821,9 +821,9 @@ if showView > 4 then
     end
 end
 
-if lockView > 1 then	 --@@ NEW!
-    lockView = 0	 --@@ NEW!
-end			 --@@ NEW!
+if lockView > 1 then	 -- cheap futureproofing code to prevent getting softlocked upon a downgrade from a future version that might let you lock to SwitchView and Grid View
+    lockView = 0
+end
 
 
 -- Custom Backgrounds
@@ -2150,8 +2150,8 @@ function DownloadCover(entry)
     launch_mode = entry.launch_type
 
     -- ID reader for PSP/PS1 games.
-    if entry.name == "RETROLNCR" then	 --@@ NEW!
-	DISC_ID = false			 --@@ NEW!
+    if entry.name == "RETROLNCR" then
+	DISC_ID = false
     elseif inPreview==false then	 -- Allows binary scanner outside triangle menu.
 	DISC_ID = false
 	if launch_mode==2 and apptype==2 and entry.directory==false then
@@ -2207,7 +2207,8 @@ function DownloadCover(entry)
      )
      ..
      (
-        (launch_mode==0 and	 (DISC_ID or entry.name))		 -- For real apps. Relatively simple. Example: "VITASHELL"
+--@@	(launch_mode==0 and	 (DISC_ID or entry.name))
+        ((launch_mode==0 or launch_mode==1 or launch_mode==2) and (DISC_ID or entry.name))		 -- @@ NEW! Real app ID's and Adr Launcher ID's. Example: "VITASHELL", "SLUS00453"
      or (launch_mode==25 and	 (entry.gameid or entry.name))		 -- For ScummVM. Example: "Freddi2"
      or (entry.name:match("(.+)%..+$")~=nil and entry.name:match("%((.+)%)")==nil and entry.name:match("(.+)%..+$") .. " (USA)")	 -- Add " (USA)" to RetroFlows with no region specified. Ex: "Donkey Kong.n64" -------> "Donkey Kong (USA)"
      or (entry.name:match("(.+)%..+$") or entry.name)			 -- For RetroFlow entries. If item has a period at the end, this removes it... otherwise it'll use the whole file name. Ex: "Donkey Kong (USA).n64" --> "Donkey Kong (USA)"
@@ -2253,8 +2254,8 @@ function DownloadSnap(entry)
     launch_mode = entry.launch_type
 
     -- ID reader for PSP/PS1 games.
-    if entry.name == "RETROLNCR" then	 --@@ NEW!
-	DISC_ID = false			 --@@ NEW!
+    if entry.name == "RETROLNCR" then
+	DISC_ID = false
     elseif inPreview==false and launch_mode==0 and (apptype==2 or apptype==3) then
 	DISC_ID =  readBin(working_dir .. "/" .. entry.name .. "/data/boot.bin", "true")
     end
@@ -2305,7 +2306,8 @@ function DownloadSnap(entry)
      )
      ..
      (
-        (launch_mode==0 and	 (DISC_ID or entry.name))		 -- For real apps. Relatively simple. Example: "VITASHELL"
+--@@	(launch_mode==0 and	 (DISC_ID or entry.name))
+        ((launch_mode==0 or launch_mode==1 or launch_mode==2) and (DISC_ID or entry.name))		 --@@ NEW! Real app ID's and Adr Launcher ID's. Example: "VITASHELL", "SLUS00453"
      or (launch_mode==25 and	 (entry.gameid or entry.name))		 -- For ScummVM. Example: "Freddi2"
      or (entry.name:match("(.+)%..+$")~=nil and entry.name:match("%((.+)%)")==nil and entry.name:match("(.+)%..+$") .. " (USA)")	 -- Add " (USA)" to RetroFlows with no region specified. Ex: "Donkey Kong.n64" -------> "Donkey Kong (USA)"
      or (entry.name:match("(.+)%..+$") or entry.name)			 -- For RetroFlow entries. If item has a period at the end, this removes it... otherwise it'll use the whole file name. Ex: "Donkey Kong (USA).n64" --> "Donkey Kong (USA)"
@@ -2966,14 +2968,11 @@ while true do
 	    if (showView == 1)					 -- n64_fix
 	    and (l == master_index)				 -- n64_fix
 	    and (file.app_type == 5 or file.app_type == 6) then	 -- n64_fix
-		--@@base_x = base_x + space
 		n64_x_bonus = n64_x_bonus - 0.35		 -- n64_fix
-	    --@@elseif l >= master_index then
-	    elseif l > master_index then			 --@@ NEW!
+	    elseif l > master_index then
                 base_x = base_x + space
 	    elseif (showView == 1)				 -- n64 fix
-	    --@@and (l <= master_index)
-	    and (l < master_index)				 --@@ NEW! n64 fix
+	    and (l < master_index)				 -- n64 fix
 	    and (file.app_type == 5 or file.app_type == 6) then	 -- n64_fix
 		base_x = base_x - n64_fatness			 -- n64_fix +0.8 base x bonus after an n64
             end
@@ -3000,8 +2999,7 @@ while true do
                         Index = "ricon"
                     })
                 end
-	    --@@DrawCover(space*(l-curTotal-1) + targetX + n64_x_bonus, -0.6, file.apptitle, file.ricon or imgCoverTmp, l, file.app_type, setReflections)
-		DrawCover(space*(l-curTotal) + targetX + n64_x_bonus, -0.6, file.apptitle, file.ricon or imgCoverTmp, l, file.app_type, setReflections)--@@ NEW! draw visible covers only @@ n64_fix
+		DrawCover(space*(l-curTotal) + targetX + n64_x_bonus, -0.6, file.apptitle, file.ricon or imgCoverTmp, l, file.app_type, setReflections)--draw visible covers only @@ n64_fix
             else
 		if skipRow == false and showView == 6 then
 		    skipRow = true
@@ -3066,8 +3064,8 @@ while true do
             Graphics.drawImage(798, 35, imgWifi)		 -- wifi icon
 	else
 	    Graphics.drawImage(798, 35, imgWifi, fourtyalpha)	 -- wifi icon: 40% opacity
-	    --@@Graphics.drawLine(797, 817, 34, 54, white)
-	    --@@Graphics.drawLine(798, 818, 34, 54, white)
+	    --Graphics.drawLine(797, 817, 34, 54, white)
+	    --Graphics.drawLine(798, 818, 34, 54, white)
 	end
 	-- END HEADER
 
