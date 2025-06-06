@@ -1,7 +1,7 @@
 # HexFlow-Launcher-Unofficial-Custom
 <p>Releases page: https://github.com/BlackSheepBoy69/HexFlow-Launcher-Unofficial-Custom/releases</p>
 <p>Revamp mod for VitaHEX's 3D coverflow style launcher for PS Vita.</p>
-<p><img src="/Media/screen_09.jpg" width="900" title="screen-20"></p>
+<p><img src="/Media/screen_09.jpg" width="900" title="screen-09"></p>
 <p>Releases page: https://github.com/BlackSheepBoy69/HexFlow-Launcher-Unofficial-Custom/releases</p>
 <p>Display and launch your games and homebrews in style.<br /><strong>HexFlow Launcher</strong> features a 3d user interface to display your games with their box art and supports many customization options like custom covers, backgrounds, and - in v0.6 and above - one custom category.</p>
 <p>Launching a game/app from <strong>HexFlow Launcher</strong> will close the launcher automaticaly without asking.</p>
