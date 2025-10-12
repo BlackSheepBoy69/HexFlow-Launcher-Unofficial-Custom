@@ -1,4 +1,4 @@
-﻿-- HexFlow Launcher Custom version 2.8.2
+﻿-- HexFlow Launcher Custom version 2.8.3
 -- based on VitaHEX's HexFlow Launcher v0.5 + SwitchView UI v0.1.2 + jimbob4000's Retroflow v7.1.0
 -- https://www.patreon.com/vitahex
 -- Want to make your own version? Right-click the vpk and select "Open with... Winrar" and edit the index.lua inside.
@@ -12,7 +12,7 @@ local SCUMMVMTime = 0
 
 dofile("app0:addons/threads.lua")
 local working_dir = "ux0:/app"
-local appversion = "2.8.2"
+local appversion = "2.8.3"
 function System.currentDirectory(dir)
     if dir == nil then
         return working_dir --"ux0:/app"
@@ -1669,6 +1669,7 @@ function LoadAppTitleTables(cache_injection)	 -- Can now cache inject to handle 
 
 	for _, v in pairs(folders_table) do
 	    v.app_type, v.icon_path = Respec_Entry(v)
+	    table.insert(files_table, file)	 --@@ NEW! Fixes a major bug where new apps wouldn't get added to "All" table sometimes.
 	end
 
 	CacheTitleTable("adrtitlecache.dat")
@@ -1791,6 +1792,7 @@ function LoadAppTitleTables(cache_injection)	 -- Can now cache inject to handle 
 
     if pic_loaded == true then
 	Graphics.freeImage(pic0)
+	pic_loaded = false	 --@@ NEW! Should fix SLV3RST3ALTH's "attempt to access wrong memory block" error.
     end
 
     table.sort(games_table, function(a, b) return (a.apptitle:lower() < b.apptitle:lower()) end)
@@ -2207,8 +2209,7 @@ function DownloadCover(entry)
      )
      ..
      (
---@@	(launch_mode==0 and	 (DISC_ID or entry.name))
-        ((launch_mode==0 or launch_mode==1 or launch_mode==2) and (DISC_ID or entry.name))		 -- @@ NEW! Real app ID's and Adr Launcher ID's. Example: "VITASHELL", "SLUS00453"
+        ((launch_mode==0 or launch_mode==1 or launch_mode==2) and (DISC_ID or entry.name))		 -- Real app ID's and Adr Launcher ID's. Example: "VITASHELL", "SLUS00453"
      or (launch_mode==25 and	 (entry.gameid or entry.name))		 -- For ScummVM. Example: "Freddi2"
      or (entry.name:match("(.+)%..+$")~=nil and entry.name:match("%((.+)%)")==nil and entry.name:match("(.+)%..+$") .. " (USA)")	 -- Add " (USA)" to RetroFlows with no region specified. Ex: "Donkey Kong.n64" -------> "Donkey Kong (USA)"
      or (entry.name:match("(.+)%..+$") or entry.name)			 -- For RetroFlow entries. If item has a period at the end, this removes it... otherwise it'll use the whole file name. Ex: "Donkey Kong (USA).n64" --> "Donkey Kong (USA)"
@@ -2306,7 +2307,6 @@ function DownloadSnap(entry)
      )
      ..
      (
---@@	(launch_mode==0 and	 (DISC_ID or entry.name))
         ((launch_mode==0 or launch_mode==1 or launch_mode==2) and (DISC_ID or entry.name))		 --@@ NEW! Real app ID's and Adr Launcher ID's. Example: "VITASHELL", "SLUS00453"
      or (launch_mode==25 and	 (entry.gameid or entry.name))		 -- For ScummVM. Example: "Freddi2"
      or (entry.name:match("(.+)%..+$")~=nil and entry.name:match("%((.+)%)")==nil and entry.name:match("(.+)%..+$") .. " (USA)")	 -- Add " (USA)" to RetroFlows with no region specified. Ex: "Donkey Kong.n64" -------> "Donkey Kong (USA)"
@@ -2968,8 +2968,10 @@ while true do
 	    if (showView == 1)					 -- n64_fix
 	    and (l == master_index)				 -- n64_fix
 	    and (file.app_type == 5 or file.app_type == 6) then	 -- n64_fix
+		base_x = base_x + space				 --@@ NEW! Reintroduced buggy sweep 1/3
 		n64_x_bonus = n64_x_bonus - 0.35		 -- n64_fix
-	    elseif l > master_index then
+--@@	    elseif l > master_index then
+	    elseif l >= master_index then			 --@@ NEW! Reintroduced buggy sweep 2/3
                 base_x = base_x + space
 	    elseif (showView == 1)				 -- n64 fix
 	    and (l < master_index)				 -- n64 fix
@@ -2999,7 +3001,8 @@ while true do
                         Index = "ricon"
                     })
                 end
-		DrawCover(space*(l-curTotal) + targetX + n64_x_bonus, -0.6, file.apptitle, file.ricon or imgCoverTmp, l, file.app_type, setReflections)--draw visible covers only @@ n64_fix
+	    --@@DrawCover(space*(l-curTotal) + targetX + n64_x_bonus, -0.6, file.apptitle, file.ricon or imgCoverTmp, l, file.app_type, setReflections)
+		DrawCover(space*(l-curTotal-1) + targetX + n64_x_bonus, -0.6, file.apptitle, file.ricon or imgCoverTmp, l, file.app_type, setReflections)--draw visible covers only @@ n64_fix @@ NEW! Reintroduced buggy sweep 3/3
             else
 		if skipRow == false and showView == 6 then
 		    skipRow = true
@@ -3285,9 +3288,9 @@ while true do
 	or (xCatLookup(showCat)[p].launch_type == 1) then	 -- (Adr launcher) PSP homebrew and PS1
 	    menuItems = 2
 	    Graphics.fillRect(24, 470, 350 + (menuY * 40), 390 + (menuY * 40), themeCol)-- selection
-	    Font.print(fnt22, 50, 352, lang_lines[20], white)				 -- Download Cover
-	    Font.print(fnt22, 50, 352+40, lang_lines[120] .. tmpcatText .. ">", white)	 -- Override Category: <  .. tmpcatText ..  >
-	    Font.print(fnt22, 50, 352+80, lang_lines[122], white)			 -- Rename
+	    Font.print(fnt22, 50, 355, lang_lines[20], white)				 -- Download Cover
+	    Font.print(fnt22, 50, 355+40, lang_lines[120] .. tmpcatText .. ">", white)	 -- Override Category: <  .. tmpcatText ..  >
+	    Font.print(fnt22, 50, 355+80, lang_lines[122], white)			 -- Rename
 
 	    --if xCatLookup(showCat)[p].fave_heart == true then
 	    --    Graphics.drawImage(420, 50, imgFav_large_on)
@@ -3526,16 +3529,20 @@ while true do
 	    if getAdr == 1 then
 		if adrenaline_brackets == true then
 		    --Font.print(fnt22, 84 + 260, 79 + 136, "<  " .. lang_lines[22] .. "- ux0:/pspemu/  >", white)--ON - ux0:/pspemu/
-		    Font.print(fnt20, 84 + 260, 79 + 136 + 1, "<  " .. lang_lines[22] .. "- ux0:/pspemu/PSP/ - ( " .. total_pspemu .. " )  >", white)--ON - ux0:/pspemu/PSP/
+--@@		    Font.print(fnt20, 84 + 260, 79 + 136 + 1, "<  " .. lang_lines[22] .. "- ux0:/pspemu/PSP/ - ( " .. total_pspemu .. " )  >", white)--ON - ux0:/pspemu/PSP/
+		    Font.print(fnt22, 84 + 260, 79 + 136, "<  " .. lang_lines[22] .. "- ux0:/pspemu/PSP/ - ( " .. total_pspemu .. " )  >", white)--ON - ux0:/pspemu/PSP/
 		else
 		    --Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[22] .. "- ux0:/pspemu/", white)--ON - ux0:/pspemu/
-		    Font.print(fnt20, 84 + 260, 79 + 136 + 1, lang_lines[22] .. "- ux0:/pspemu/PSP/ - ( " .. total_pspemu .. " )", white)--ON - ux0:/pspemu/PSP/
+--@@		    Font.print(fnt20, 84 + 260, 79 + 136 + 1, lang_lines[22] .. "- ux0:/pspemu/PSP/ - ( " .. total_pspemu .. " )", white)--ON - ux0:/pspemu/PSP/
+		    Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[22] .. "- ux0:/pspemu/PSP/ - ( " .. total_pspemu .. " )", white)--ON - ux0:/pspemu/PSP/
 		end
 	    elseif getAdr == 2 then
 		if adrenaline_brackets == true then
-		    Font.print(fnt20, 84 + 260, 79 + 136 + 1, "<  " .. lang_lines[22] .. "- uma0:/pspemu/PSP/ - ( " .. total_pspemu .. " )  >", white)--ON - uma0:/pspemu/PSP/
+--@@		    Font.print(fnt20, 84 + 260, 79 + 136 + 1, "<  " .. lang_lines[22] .. "- uma0:/pspemu/PSP/ - ( " .. total_pspemu .. " )  >", white)--ON - uma0:/pspemu/PSP/
+		    Font.print(fnt22, 84 + 260, 79 + 136, "<  " .. lang_lines[22] .. "- uma0:/pspemu/PSP/ - ( " .. total_pspemu .. " )  >", white)--ON - uma0:/pspemu/PSP/
 		else
-		    Font.print(fnt20, 84 + 260, 79 + 136 + 1, lang_lines[22] .. "- uma0:/pspemu/PSP/ - ( " .. total_pspemu .. " )", white)--ON - uma0:/pspemu/PSP/
+--@@		    Font.print(fnt20, 84 + 260, 79 + 136 + 1, lang_lines[22] .. "- uma0:/pspemu/PSP/ - ( " .. total_pspemu .. " )", white)--ON - uma0:/pspemu/PSP/
+		    Font.print(fnt22, 84 + 260, 79 + 136, lang_lines[22] .. "- uma0:/pspemu/PSP/ - ( " .. total_pspemu .. " )", white)--ON - uma0:/pspemu/PSP/
 		end
 	    else
 		--Font.print(fnt22, 84 + 260, 79 + 136, "<  " .. lang_lines[23] .. "- PSP/PS1 with bubbles only  >", white)--OFF
